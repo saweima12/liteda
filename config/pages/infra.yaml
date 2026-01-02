@@ -1,0 +1,41 @@
+# Infrastructure Page
+- name: Virtualization
+  items:
+    - name: Proxmox
+      icon: proxmox
+      url: https://pve.local:8006
+      description: VM management
+
+    - name: Portainer
+      icon: portainer
+      url: http://portainer.local:9000
+      description: Docker management
+
+- name: Monitoring
+  items:
+    - name: Grafana
+      icon: grafana
+      url: http://grafana.local:3000
+      description: Metrics dashboard
+
+    - name: Uptime Kuma
+      icon: uptime-kuma
+      url: http://uptime.local:3001
+      description: Service monitoring
+
+    - name: Prometheus
+      icon: prometheus
+      url: http://prometheus.local:9090
+      description: Metrics collection
+
+- name: Network
+  items:
+    - name: Pi-hole
+      icon: pi-hole
+      url: http://pihole.local/admin
+      description: DNS ad blocker
+
+    - name: Traefik
+      icon: traefik
+      url: http://traefik.local:8080
+      description: Reverse proxy

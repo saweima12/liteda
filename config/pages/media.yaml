@@ -1,0 +1,29 @@
+# Media Services Page
+- name: Streaming
+  items:
+    - name: Jellyfin
+      icon: jellyfin
+      url: http://jellyfin.local:8096
+      description: Media server
+
+    - name: Plex
+      icon: plex
+      url: http://plex.local:32400
+      description: Stream movies & TV
+
+- name: Management
+  items:
+    - name: Sonarr
+      icon: sonarr
+      url: http://sonarr.local:8989
+      description: TV show management
+
+    - name: Radarr
+      icon: radarr
+      url: http://radarr.local:7878
+      description: Movie management
+
+    - name: Prowlarr
+      icon: prowlarr
+      url: http://prowlarr.local:9696
+      description: Indexer management

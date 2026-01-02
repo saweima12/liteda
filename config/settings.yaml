@@ -1,0 +1,39 @@
+# Homepage Lite Settings
+title: Liteda
+
+# Theme: light, dark, or auto
+theme: dark
+
+# Background (optional)
+background:
+  image: https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920
+  opacity: 0.3
+  blur: 2
+
+# Layout
+layout:
+  columns: 3
+  style: grid
+
+# Pages (optional - if not set, services.yaml is used as single page)
+pages:
+  - id: home
+    name: Home
+    icon: home
+    file: services.yaml
+  - id: media
+    name: Media
+    icon: play
+    file: pages/media.yaml
+  - id: infra
+    name: Infrastructure
+    icon: server
+    file: pages/infra.yaml
+  - id: notes
+    name: Notes
+    icon: folder
+    file: pages/notes.md
+
+# Custom CSS (optional)
+# customCss: |
+#   .custom-class { color: red; }

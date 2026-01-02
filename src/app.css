@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-opacity: 0.8;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 225 4.8% 85.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 72.2% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-opacity: 0.8;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 70% 35%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply text-foreground;
+    /* Background color is handled by bg-pattern or background image */
+  }
+
+  .bg-card {
+    background-color: hsl(var(--card) / var(--card-opacity)) !important;
+    backdrop-filter: blur(8px);
+    border-color: hsl(var(--border) / var(--card-opacity));
+  }
+
+}
+
+/* Background pattern - only shows when no background image */
+.bg-pattern {
+  background-color: hsl(var(--background));
+  background-image: 
+    radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.05) 0%, transparent 50%);
+}
+
+/* When background image is present, make pattern transparent */
+.bg-pattern:has(+ .max-w-7xl [class*="fixed"][class*="-z-10"]),
+body:has([class*="fixed"][class*="-z-10"]) .bg-pattern {
+  background-color: transparent;
+  background-image: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/40;
+}
+
+/* Prose styling - override colors to match shadcn theme */
+.prose {
+  --tw-prose-body: hsl(var(--foreground));
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-links: hsl(var(--primary));
+  --tw-prose-bold: hsl(var(--foreground));
+  --tw-prose-code: hsl(var(--foreground));
+  --tw-prose-pre-bg: hsl(var(--muted));
+  --tw-prose-pre-code: hsl(var(--foreground));
+  --tw-prose-quotes: hsl(var(--muted-foreground));
+  --tw-prose-quote-borders: hsl(var(--border));
+  --tw-prose-hr: hsl(var(--border));
+  --tw-prose-th-borders: hsl(var(--border));
+  --tw-prose-td-borders: hsl(var(--border));
+}

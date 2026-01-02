@@ -1,0 +1,97 @@
+# Home Page Services
+
+# Example: Nested groups with columns (groups arranged in grid)
+- name: Infrastructure
+  icon: server
+  columns: 2  # 2 groups side by side
+  groups:
+    - name: Monitoring
+      columns: 1
+      items:
+        - name: Grafana
+          icon: grafana
+          url: https://grafana.local
+          description: Metrics dashboard
+        - name: Prometheus
+          icon: prometheus
+          url: https://prometheus.local
+          description: Monitoring system
+    - name: Management
+      columns: 1
+      items:
+        - name: Portainer
+          icon: portainer
+          url: https://portainer.local
+          description: Container management
+        - name: Proxmox
+          icon: proxmox
+          url: https://pve.local
+          description: Virtualization platform
+
+# Example: Flat group with items
+- name: Quick Access
+  columns: 2
+  items:
+    - name: Demo Widget
+      icon: shoko-server
+      description: Demo widget example
+      widget:
+        type: demo
+        interval: 5000
+        # Server-side only variables (never exposed to browser)
+        vars:
+          apiKey: "your-secret-api-key"
+          endpoint: "https://api.example.com/status"
+
+    - name: GitHub
+      icon: github
+      url: https://github.com
+      description: Code repository
+
+    - name: GitLab
+      icon: gitlab
+      url: https://gitlab.com
+      description: DevOps platform
+
+    - name: Docker Hub
+      icon: docker
+      url: https://hub.docker.com
+      description: Container registry
+
+- name: Tools
+  items:
+    - name: Excalidraw
+      icon: excalidraw
+      url: https://excalidraw.com
+      description: Virtual whiteboard
+
+    - name: Regex101
+      url: https://regex101.com
+      description: Regex tester
+
+    - name: JSON Formatter
+      url: https://jsonformatter.org
+      description: JSON tools
+
+# Example: Bookmarks (tags style)
+- name: Quick Links
+  type: bookmarks
+  items:
+    - name: Google
+      url: https://google.com
+      icon: google
+    - name: YouTube
+      url: https://youtube.com
+      icon: youtube
+    - name: Reddit
+      url: https://reddit.com
+      icon: reddit
+    - name: Hacker News
+      url: https://news.ycombinator.com
+      icon: hackernews
+    - name: SvelteKit Docs
+      url: https://kit.svelte.dev/docs
+      icon: svelte
+    - name: Tailwind CSS
+      url: https://tailwindcss.com/docs
+      icon: tailwindcss

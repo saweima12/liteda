@@ -1,0 +1,17 @@
+services:
+  liteda:
+    build: .
+    container_name: liteda
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Config files
+      - ./config:/app/config:ro
+      # Docker socket for container widget
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NODE_ENV=production
+      - CONFIG_DIR=/app/config
+    # Optional: run as specific user
+    # user: "1000:1000"
