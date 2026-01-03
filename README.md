@@ -4,7 +4,7 @@ A lightweight, fast dashboard for your homelab. Built with SvelteKit and shadcn-
 
 ## Features
 
-- 🚀 **Lightweight** - ~50-80MB memory usage (vs 150-200MB for Next.js alternatives)
+- 🚀 **Lightweight** - ~50-80MB memory usage
 - ⚡ **Fast** - SvelteKit with Svelte 5 runes
 - 📄 **YAML Config** - Simple configuration files
 - 🎨 **Themeable** - Light/dark mode with shadcn-svelte
