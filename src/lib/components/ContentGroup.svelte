@@ -16,6 +16,7 @@
   const isNested = $derived(group.groups && group.groups.length > 0);
   const columns = $derived(group.columns ?? defaultColumns);
   const isBookmarks = $derived(group.type === 'bookmarks');
+  const equalHeight = $derived(group.equalHeight ?? true);
 
   const gridCols: Record<number, string> = {
     1: 'grid-cols-1',
@@ -67,6 +68,7 @@
       {#each group.groups as innerGroup (innerGroup.name)}
         {@const innerCols = innerGroup.columns ?? defaultColumns}
         {@const innerIsBookmarks = isInnerBookmarks(innerGroup)}
+        {@const innerEqualHeight = innerGroup.equalHeight ?? true}
         
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -106,9 +108,9 @@
               {/each}
             </div>
           {:else}
-            <div class="grid gap-4 {gridCols[innerCols] || gridCols[1]}">
+            <div class="grid gap-4 {innerEqualHeight ? 'items-stretch' : 'items-start'} {gridCols[innerCols] || gridCols[1]}">
               {#each innerGroup.items as service (service.name)}
-                <ServiceCard {service} widgetId={getWidgetId(group.name, service.name, innerGroup.name)} />
+                <ServiceCard {service} widgetId={getWidgetId(group.name, service.name, innerGroup.name)} equalHeight={innerEqualHeight} />
               {/each}
             </div>
           {/if}
@@ -156,9 +158,9 @@
         {/each}
       </div>
     {:else}
-      <div class="grid gap-4 {gridCols[columns] || gridCols[3]}">
+      <div class="grid gap-4 {equalHeight ? 'items-stretch' : 'items-start'} {gridCols[columns] || gridCols[3]}">
         {#each group.items ?? [] as service (service.name)}
-          <ServiceCard {service} widgetId={getWidgetId(group.name, service.name)} />
+          <ServiceCard {service} widgetId={getWidgetId(group.name, service.name)} {equalHeight} />
         {/each}
       </div>
     {/if}

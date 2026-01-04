@@ -14,6 +14,11 @@ background:
 layout:
   columns: 3
   style: grid
+  # Header addons (optional - default: title, spacer, theme-switcher)
+  header:
+    - type: title
+    - type: spacer
+    - type: theme-switcher
 
 # Pages (optional - if not set, services.yaml is used as single page)
 pages:

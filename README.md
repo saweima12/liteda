@@ -1,15 +1,18 @@
 # Liteda
 
-A lightweight, fast dashboard for your homelab. Built with SvelteKit and shadcn-svelte.
+A lightweight, memory-efficient dashboard for your homelab. Built with SvelteKit for fast performance and simple YAML configuration.
+
+![black-mode](./images/0.png)
 
 ## Features
 
-- 🚀 **Lightweight** - ~50-80MB memory usage
-- ⚡ **Fast** - SvelteKit with Svelte 5 runes
-- 📄 **YAML Config** - Simple configuration files
-- 🎨 **Themeable** - Light/dark mode with shadcn-svelte
-- 📱 **Multi-page** - Tab-based navigation with URL hash
-- 🔌 **Extensible** - Easy widget system with auto-discovery
+- 🚀 **Lightweight** - ~50-80MB base memory usage
+- ⚡ **Fast** - Built with SvelteKit and Svelte 5 for snappy performance
+- 📄 **Simple Config** - YAML files + Markdown pages, no database needed
+- 🎨 **Customizable** - Themes, backgrounds, flexible header layout
+- 📱 **Multi-page** - Organize services into tabbed pages
+- 🔌 **Live Widgets** - Real-time status from Portainer, Proxmox, AdGuard, and more
+- 🔀 **SSR Proxy** - Server-side API calls, no CORS issues with your services
 
 ## Quick Start
 
@@ -33,12 +36,12 @@ All configuration files are in the `config/` directory:
 
 ```
 config/
-├── settings.yaml      # Global settings, theme, pages
-├── services.yaml      # Home page services
-├── bookmarks.yaml     # Bookmarks
+├── settings.yaml      # Global settings, theme, layout, header
+├── services.yaml      # Default home page
 └── pages/             # Additional pages
-    ├── media.yaml
-    └── infra.yaml
+    ├── media.yaml     # YAML page
+    ├── infra.yaml
+    └── notes.md       # Markdown page with frontmatter
 ```
 
 ### settings.yaml
@@ -47,102 +50,227 @@ config/
 title: My Dashboard
 theme: dark  # light, dark, auto
 
+background:
+  image: https://example.com/bg.jpg
+  opacity: 0.3
+  blur: 2
+
+layout:
+  columns: 3
+  # Customizable header with addons
+  header:
+    - type: title
+    - type: spacer
+    - type: theme-switcher
+
 pages:
   - id: home
     name: Home
     icon: home
     file: services.yaml
-  - id: media
-    name: Media
-    icon: play
-    file: pages/media.yaml
-
-layout:
-  columns: 3
+  - id: notes
+    name: Notes
+    icon: folder
+    file: pages/notes.md
 ```
 
-### services.yaml
+### Service Groups
 
 ```yaml
-- name: Infrastructure
+# Flat group with items
+- name: Quick Access
+  columns: 2
+  equalHeight: true  # Cards in same row have equal height (default: true)
   items:
-    - name: Proxmox
-      icon: proxmox
-      url: https://pve.local:8006
-      description: VM management
+    - name: Portainer
+      icon: portainer
+      url: https://portainer.local
+      description: Container management
       widget:
-        type: demo
-        interval: 5000
+        type: portainer
+        interval: 10000
+        vars:
+          url: https://portainer.local
+          key: "your-api-key"
+          env: 1
+
+# Nested groups
+- name: Infrastructure
+  icon: server
+  columns: 2
+  groups:
+    - name: Monitoring
+      items:
+        - name: Grafana
+          icon: grafana
+          url: https://grafana.local
+    - name: Management
+      items:
+        - name: Proxmox
+          icon: proxmox
+          url: https://pve.local
+
+# Bookmarks style (compact tags)
+- name: Quick Links
+  type: bookmarks
+  items:
+    - name: Google
+      url: https://google.com
+      icon: google
 ```
 
-## Creating Widgets
+### Markdown Pages
 
-Widgets are auto-discovered. Create a new folder in `src/lib/widgets/`:
+Create `.md` files with frontmatter for mixed content pages:
+
+```markdown
+---
+blocks:
+  tools:
+    name: Common Tools
+    type: services
+    columns: 2
+    items:
+      - name: Portainer
+        url: https://portainer.local
+        icon: portainer
+---
+
+# Server Notes
+
+Some documentation here...
+
+::: block:tools :::
+
+More content below the service cards...
+```
+
+## Widgets
+
+Widgets display live data from your services. They use a three-file structure with auto-discovery.
+
+### Structure
 
 ```
-src/lib/widgets/mywidget/
-├── meta.ts        # Widget metadata
-├── handler.ts     # API handler (server-side)
-└── MyWidget.svelte  # UI component
+src/lib/widgets/my-widget/
+├── meta.ts       # Widget definition + schemas
+├── handler.ts    # Server-side data fetching
+└── Widget.svelte # UI component
 ```
 
-### meta.ts
+### Creating a Widget
 
+**meta.ts**
 ```typescript
-import type { WidgetMeta } from '../types';
-import MyWidget from './MyWidget.svelte';
+import { z } from 'zod';
+import { defineWidget } from '../utils/define';
+import Widget from './Widget.svelte';
 
-export default {
-  name: 'mywidget',
-  component: MyWidget,
+export default defineWidget({
+  name: 'my-widget',
+  component: Widget,
   description: 'My custom widget',
-} satisfies WidgetMeta;
+  
+  dataSchema: z.object({
+    status: z.string(),
+    count: z.number(),
+  }),
+  
+  varsSchema: z.object({
+    url: z.string().url(),
+    apiKey: z.string(),
+  }),
+});
 ```
 
-### handler.ts
-
+**handler.ts**
 ```typescript
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from '@sveltejs/kit';
+import { createHandler } from '../utils/create-handler';
+import widget from './meta';
 
-export const POST: RequestHandler = async ({ request }) => {
-  const config = await request.json();
+export const POST = createHandler({
+  varsSchema: widget.varsSchema,
   
-  // Fetch data from your service
-  const data = { /* ... */ };
-  
-  return json(data);
-};
+  async fetch(vars) {
+    const res = await fetch(`${vars.url}/api/status`, {
+      headers: { Authorization: `Bearer ${vars.apiKey}` },
+    });
+    const data = await res.json();
+    return { status: data.status, count: data.total };
+  },
+});
 ```
 
-### MyWidget.svelte
-
+**Widget.svelte**
 ```svelte
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import type { WidgetConfig } from '../types';
+  import type { WidgetProps } from '../types';
+  import widget from './meta';
+  import { useWidget } from '../utils';
+  import { Block, Row, Status } from '$components/widget-ui';
 
-  let { config }: { config: WidgetConfig } = $props();
-  let data = $state(null);
-
-  async function fetchData() {
-    const res = await fetch('/api/widgets/mywidget', {
-      method: 'POST',
-      body: JSON.stringify(config),
-    });
-    data = await res.json();
-  }
-
-  onMount(() => {
-    fetchData();
-    const id = setInterval(fetchData, config.interval || 30000);
-    return () => clearInterval(id);
-  });
+  let { config }: WidgetProps = $props();
+  const { data, loading, error } = useWidget(widget, () => config);
 </script>
 
-{#if data}
-  <!-- Render your widget -->
-{/if}
+<Block>
+  {#if loading}
+    <Skeleton class="h-8" />
+  {:else if error}
+    <span class="text-destructive">{error}</span>
+  {:else if data}
+    <Status status={data.status === 'ok' ? 'healthy' : 'error'} />
+    <Row label="Count" value={data.count} />
+  {/if}
+</Block>
+```
+
+### Widget Features
+
+- **Auto-discovery** - Just create the folder, no registration needed
+- **Type-safe** - Zod schemas for data and vars validation
+- **Server-side caching** - Prevents duplicate requests from multiple clients
+- **Secure** - `vars` (API keys) never sent to browser
+
+### Built-in Widgets
+
+| Widget | Description |
+|--------|-------------|
+| `demo` | Demo/testing widget |
+| `portainer` | Docker container status |
+| `proxmox` | VM/LXC status |
+| `adguard` | AdGuard Home statistics |
+| `cloudflared` | Cloudflare Tunnel status |
+| `nginx-proxy-manager` | NPM proxy hosts/certificates |
+
+## Addons
+
+Addons are components for the header bar. Like widgets, they use auto-discovery.
+
+### Structure
+
+```
+src/lib/addons/my-addon/
+├── meta.ts      # Addon definition
+└── Addon.svelte # UI component
+```
+
+### Built-in Addons
+
+| Addon | Description |
+|-------|-------------|
+| `title` | Display site title |
+| `spacer` | Flexible space (flex-grow) |
+| `theme-switcher` | Light/dark mode toggle |
+
+### Configuration
+
+```yaml
+layout:
+  header:
+    - type: title
+    - type: spacer
+    - type: theme-switcher
 ```
 
 ## Docker
@@ -154,18 +282,45 @@ docker run -p 3000:3000 -v ./config:/app/config liteda
 
 Or with docker-compose:
 
+```yaml
+services:
+  liteda:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+```
+
 ```bash
 docker compose up -d
 ```
 
 ## Tech Stack
 
-- [SvelteKit](https://kit.svelte.dev/) - Framework
-- [Svelte 5](https://svelte.dev/) - UI with runes
+- [SvelteKit](https://kit.svelte.dev/) - Full-stack framework
+- [Svelte 5](https://svelte.dev/) - UI with runes ($state, $derived, $effect)
 - [shadcn-svelte](https://shadcn-svelte.com/) - UI components
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first styling
+- [Zod](https://zod.dev/) - Schema validation
 - [mode-watcher](https://github.com/svecosystem/mode-watcher) - Theme management
+- [unplugin-icons](https://github.com/unplugin/unplugin-icons) - Icon components (Lucide)
+- [Dashboard Icons](https://github.com/walkxcode/dashboard-icons) - Service icons via CDN
 
-## License
+## Development
 
-MIT
+### Adding a New Widget
+
+1. Copy the template: `cp -r src/lib/widgets/_template src/lib/widgets/my-widget`
+2. Edit `meta.ts` with your schemas
+3. Implement `handler.ts` for data fetching
+4. Build UI in `Widget.svelte`
+5. Use in config with `widget.type: my-widget`
+
+### Adding a New Addon
+
+1. Create folder in `src/lib/addons/`
+2. Add `meta.ts` with `defineAddon()`
+3. Create `Addon.svelte` component
+4. Use in `settings.yaml` header config

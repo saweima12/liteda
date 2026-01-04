@@ -8,6 +8,7 @@
   interface Props {
     service: ServiceItem;
     widgetId?: string;
+    equalHeight?: boolean;
   }
 
   function getIconUrl(icon: string | undefined): string | null {
@@ -17,10 +18,11 @@
     return `https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/${icon}.png`;
   }
 
-  let { service, widgetId }: Props = $props();
+  let { service, widgetId, equalHeight = true }: Props = $props();
 
   const iconUrl = $derived(getIconUrl(service.icon));
   const hasUrl = $derived(!!service.url);
+  const heightClass = $derived(equalHeight ? 'h-full' : '');
 
   // Create client-safe widget config (no vars!)
   const clientWidgetConfig = $derived.by((): ClientWidgetConfig | undefined => {
@@ -85,14 +87,14 @@
     href={service.url}
     target={service.target}
     rel="noopener noreferrer"
-    class="block group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+    class="block {heightClass} group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
   >
-    <Card class="p-4 transition-all duration-200 group-hover:shadow-md group-hover:border-primary/20 group-hover:bg-accent/30">
+    <Card class="{heightClass} p-4 transition-all duration-200 group-hover:shadow-md group-hover:border-primary/20 group-hover:bg-accent/30">
       {@render cardContent()}
     </Card>
   </a>
 {:else}
-  <Card class="p-4">
+  <Card class="{heightClass} p-4">
     {@render cardContent()}
   </Card>
 {/if}

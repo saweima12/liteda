@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, setContext } from 'svelte';
   import { browser } from '$app/environment';
   import type { PageData } from './$types';
-  import { ContentGroup, ThemeToggle, PageTabs, MarkdownContent } from '$components';
+  import { ContentGroup, PageTabs, MarkdownContent, Bar } from '$components';
   import IconSettings from '~icons/lucide/settings';
 
   let { data }: { data: PageData } = $props();
@@ -12,6 +12,20 @@
   const pages = $derived(data.pages);
   const widgetIds = $derived(data.widgetIds);
   const defaultColumns = $derived(settings.layout?.columns ?? 3);
+  const headerItems = $derived(settings.layout?.header);
+
+  // Provide settings to child components (for addons like title)
+  // Using a getter so derived value stays reactive
+  setContext('settings', {
+    get current() { return settings; }
+  });
+
+  // Default header if not configured
+  const defaultHeader = [
+    { type: 'title' },
+    { type: 'spacer' },
+    { type: 'theme-switcher' },
+  ];
 
   // Current page state (from hash)
   let currentPageId = $state('home');
@@ -73,11 +87,8 @@
 
 <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
   <!-- Header -->
-  <header class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-foreground">{settings.title}</h1>
-    <div class="flex items-center gap-2">
-      <ThemeToggle />
-    </div>
+  <header class="mb-6">
+    <Bar items={headerItems ?? defaultHeader} />
   </header>
 
   <!-- Page Tabs -->

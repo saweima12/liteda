@@ -2,7 +2,7 @@
 
 # Example: Nested groups with columns (groups arranged in grid)
 - name: Infrastructure
-  icon: server
+  icon: openldap
   columns: 2  # 2 groups side by side
   groups:
     - name: Monitoring
@@ -88,10 +88,10 @@
       icon: reddit
     - name: Hacker News
       url: https://news.ycombinator.com
-      icon: hackernews
+      icon: hacker-news
     - name: SvelteKit Docs
       url: https://kit.svelte.dev/docs
       icon: svelte
     - name: Tailwind CSS
       url: https://tailwindcss.com/docs
-      icon: tailwindcss
+      icon: css

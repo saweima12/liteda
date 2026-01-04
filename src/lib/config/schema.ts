@@ -26,6 +26,7 @@ export const innerGroupSchema = z.object({
   icon: z.string().optional(),
   type: z.enum(['services', 'bookmarks']).optional().default('services'),
   columns: z.number().min(1).max(6).optional(),
+  equalHeight: z.boolean().optional().default(true),
   items: z.array(serviceItemSchema),
 });
 
@@ -35,6 +36,7 @@ export const serviceGroupSchema = z.object({
   icon: z.string().optional(),
   type: z.enum(['services', 'bookmarks']).optional().default('services'),
   columns: z.number().min(1).max(6).optional(),
+  equalHeight: z.boolean().optional().default(true).optional(),
   // Either items OR groups, not both
   items: z.array(serviceItemSchema).optional(),
   groups: z.array(innerGroupSchema).optional(),
@@ -56,6 +58,11 @@ export const pageSchema = z.object({
   file: z.string(), // yaml file path relative to config/
 });
 
+// Addon config schema (for Bar items)
+export const addonConfigSchema = z.object({
+  type: z.string(),
+}).passthrough(); // Allow additional properties for addon-specific config
+
 // Settings schema
 export const settingsSchema = z.object({
   title: z.string().optional().default('Homepage'),
@@ -71,9 +78,11 @@ export const settingsSchema = z.object({
   layout: z.object({
     columns: z.number().min(1).max(6).optional().default(3),
     style: z.enum(['grid', 'masonry']).optional().default('grid'),
+    header: z.array(addonConfigSchema).optional(),
   }).optional(),
   pages: z.array(pageSchema).optional(),
 });
+
 
 // Page file schema (array of groups)
 export const servicesFileSchema = z.array(serviceGroupSchema);
@@ -99,6 +108,7 @@ export const configSchema = z.object({
 });
 
 // Type exports
+export type AddonConfig = z.infer<typeof addonConfigSchema>;
 export type WidgetConfig = z.infer<typeof widgetConfigSchema>;
 export type ServiceItem = z.infer<typeof serviceItemSchema>;
 export type InnerGroup = z.infer<typeof innerGroupSchema>;
