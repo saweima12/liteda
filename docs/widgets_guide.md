@@ -287,6 +287,60 @@ Progress bar with auto-coloring.
 
 ---
 
+## Caching
+
+Widget data is automatically cached on the server side to reduce load on backend services.
+
+### How it works
+
+- When multiple clients request the same widget, only one request is made to the backend
+- Cached data is returned for subsequent requests until TTL expires
+- Thundering herd prevention: concurrent requests share the same pending promise
+
+### Cache TTL Priority
+
+1. `cacheTtl` option in `createHandler()` (if specified)
+2. Widget's `interval` from config
+3. Default: 5000ms (5 seconds)
+
+### Customizing Cache Behavior
+
+```typescript
+// Use custom cache TTL
+export const POST = createHandler({
+  varsSchema: widget.varsSchema,
+  cacheTtl: 10000, // Cache for 10 seconds
+  async fetch(vars) {
+    // ...
+  },
+});
+
+// Disable caching for real-time data
+export const POST = createHandler({
+  varsSchema: widget.varsSchema,
+  cacheTtl: 0, // No caching
+  async fetch(vars) {
+    // ...
+  },
+});
+```
+
+### Cache Invalidation
+
+Cache entries expire automatically based on TTL. For manual invalidation:
+
+```typescript
+import { invalidateCache, clearCache } from '../utils';
+
+// Invalidate specific widget
+invalidateCache('widget-1');
+
+// Clear all cache
+clearCache();
+```
+
+---
+
 ## Security Notes
 
 1. **`vars` are never sent to the client**

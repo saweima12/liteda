@@ -20,6 +20,7 @@
   let { service, widgetId }: Props = $props();
 
   const iconUrl = $derived(getIconUrl(service.icon));
+  const hasUrl = $derived(!!service.url);
 
   // Create client-safe widget config (no vars!)
   const clientWidgetConfig = $derived.by((): ClientWidgetConfig | undefined => {
@@ -32,7 +33,7 @@
   });
 </script>
 
-<Card class="p-4 transition-all duration-200 hover:shadow-md hover:border-primary/20">
+{#snippet cardContent()}
   <div class="flex items-start gap-3">
     <!-- Icon -->
     {#if iconUrl}
@@ -57,18 +58,9 @@
     <!-- Content -->
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2">
-        {#if service.url}
-          <a
-            href={service.url}
-            target={service.target}
-            rel="noopener noreferrer"
-            class="font-medium text-foreground hover:text-primary transition-colors truncate"
-          >
-            {service.name}
-          </a>
+        <span class="font-medium text-foreground truncate">{service.name}</span>
+        {#if hasUrl}
           <IconExternalLink class="h-3 w-3 text-muted-foreground flex-shrink-0" />
-        {:else}
-          <span class="font-medium text-foreground truncate">{service.name}</span>
         {/if}
       </div>
 
@@ -86,4 +78,21 @@
       {/if}
     </div>
   </div>
-</Card>
+{/snippet}
+
+{#if hasUrl}
+  <a
+    href={service.url}
+    target={service.target}
+    rel="noopener noreferrer"
+    class="block group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+  >
+    <Card class="p-4 transition-all duration-200 group-hover:shadow-md group-hover:border-primary/20 group-hover:bg-accent/30">
+      {@render cardContent()}
+    </Card>
+  </a>
+{:else}
+  <Card class="p-4">
+    {@render cardContent()}
+  </Card>
+{/if}
