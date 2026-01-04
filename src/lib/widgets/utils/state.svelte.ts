@@ -1,5 +1,5 @@
 import { fetchWidget, createAbortController } from './fetch';
-import type { ClientWidgetConfig } from '../types';
+import type { ClientWidgetConfig, WidgetResponse, ServiceStatus } from '../types';
 import type { ZodType } from 'zod';
 
 /** Widget definition with name and dataSchema for type inference */
@@ -24,6 +24,8 @@ export function createWidgetState<T>(type: string, getConfig: () => ClientWidget
     data: null as T | null,
     error: null as string | null,
     loading: true,
+    status: 'unknown' as ServiceStatus,
+    latency: null as number | null,
   });
 
   const abortController = createAbortController();
@@ -33,13 +35,17 @@ export function createWidgetState<T>(type: string, getConfig: () => ClientWidget
     try {
       const config = getConfig();
       // Only send safe data to server: id for lookup
-      state.data = await fetchWidget<T>(type, { id: config.id }, {
+      const response = await fetchWidget<WidgetResponse<T>>(type, { id: config.id }, {
         signal: abortController.getSignal(),
       });
+      state.data = response.data;
+      state.status = response.status;
+      state.latency = response.latency ?? null;
       state.error = null;
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') return;
       state.error = e instanceof Error ? e.message : 'Unknown error';
+      state.status = 'offline';
     } finally {
       state.loading = false;
     }
@@ -62,6 +68,8 @@ export interface WidgetState<T> {
   readonly data: T | null;
   readonly error: string | null;
   readonly loading: boolean;
+  readonly status: ServiceStatus;
+  readonly latency: number | null;
   refresh: () => Promise<void>;
 }
 
@@ -76,7 +84,7 @@ export interface WidgetState<T> {
  *   import { useWidget } from '../utils';
  *   
  *   let { config }: Props = $props();
- *   const { data, loading, error } = useWidget(widget, () => config);
+ *   const { data, loading, error, status } = useWidget(widget, () => config);
  * </script>
  * 
  * {#if loading}
@@ -95,6 +103,8 @@ export function useWidget<TData>(
   let data = $state<TData | null>(null);
   let error = $state<string | null>(null);
   let loading = $state(true);
+  let status = $state<ServiceStatus>('unknown');
+  let latency = $state<number | null>(null);
 
   const abortController = createAbortController();
   let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -102,13 +112,17 @@ export function useWidget<TData>(
   async function refresh() {
     try {
       const config = getConfig();
-      data = await fetchWidget<TData>(widget.name, { id: config.id }, {
+      const response = await fetchWidget<WidgetResponse<TData>>(widget.name, { id: config.id }, {
         signal: abortController.getSignal(),
       });
+      data = response.data;
+      status = response.status;
+      latency = response.latency ?? null;
       error = null;
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') return;
       error = e instanceof Error ? e.message : 'Unknown error';
+      status = 'offline';
     } finally {
       loading = false;
     }
@@ -132,6 +146,8 @@ export function useWidget<TData>(
     get data() { return data; },
     get error() { return error; },
     get loading() { return loading; },
+    get status() { return status; },
+    get latency() { return latency; },
     refresh,
   };
 }

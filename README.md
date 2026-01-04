@@ -11,7 +11,6 @@ A lightweight, memory-efficient dashboard for your homelab. Built with SvelteKit
 - 📄 **Simple Config** - YAML files + Markdown pages, no database needed
 - 🎨 **Customizable** - Themes, backgrounds, flexible header layout
 - 📱 **Multi-page** - Organize services into tabbed pages
-- 🔌 **Live Widgets** - Real-time status from Portainer, Proxmox, AdGuard, and more
 - 🔀 **SSR Proxy** - Server-side API calls, no CORS issues with your services
 
 ## Quick Start

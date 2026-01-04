@@ -9,9 +9,10 @@
     defaultColumns?: number;
     pageId?: string;
     widgetIds?: Record<string, string>;
+    statusIds?: Record<string, string>;
   }
 
-  let { content, blocks = {}, defaultColumns = 3, pageId = '', widgetIds = {} }: Props = $props();
+  let { content, blocks = {}, defaultColumns = 3, pageId = '', widgetIds = {}, statusIds = {} }: Props = $props();
 
   // Parse content, separate HTML and block placeholders
   interface ContentPart {
@@ -76,7 +77,7 @@
           name: block.name, 
           type: block.type,
           columns: block.columns,
-          items: block.items 
+          items: block.items
         }} 
         {defaultColumns}
         pageId="{pageId}:block:{part.value}"

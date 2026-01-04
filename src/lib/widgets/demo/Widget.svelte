@@ -1,20 +1,24 @@
 <script lang="ts">
-  import type { ClientWidgetConfig } from '../types';
+  import type { WidgetProps } from '../types';
   import widgetDef from './meta';
   import { useWidget } from '../utils';
-  import { Block, Row, Cell } from '$components/widget-ui';
+  import { Block, Cell } from '$components/widget-ui';
   import { Skeleton } from '$components/ui';
-  import IconClock from '~icons/lucide/clock';
   import IconAlertCircle from '~icons/lucide/alert-circle';
 
-  interface Props {
-    config: ClientWidgetConfig;
-  }
-
-  let { config }: Props = $props();
+  let { config, onStatus }: WidgetProps = $props();
 
   // Don't destructure - it breaks reactivity
   const widget = useWidget(widgetDef, () => config);
+
+  // Emit status changes
+  $effect(() => {
+    if (onStatus) {
+      onStatus(new CustomEvent('status', { 
+        detail: { status: widget.status, latency: widget.latency } 
+      }));
+    }
+  });
 </script>
 
 <Block>

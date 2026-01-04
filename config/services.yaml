@@ -45,11 +45,13 @@
 
     - name: GitHub
       icon: github
+      statuscheck: true
       url: https://github.com
       description: Code repository
 
     - name: GitLab
       icon: gitlab
+      statuscheck: true
       url: https://gitlab.com
       description: DevOps platform
 

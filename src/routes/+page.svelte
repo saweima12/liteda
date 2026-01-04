@@ -11,6 +11,7 @@
   const pagesList = $derived(data.pagesList);
   const pages = $derived(data.pages);
   const widgetIds = $derived(data.widgetIds);
+  const statusIds = $derived(data.statusIds);
   const defaultColumns = $derived(settings.layout?.columns ?? 3);
   const headerItems = $derived(settings.layout?.header);
 
@@ -101,14 +102,14 @@
   <!-- Markdown Content -->
   {#if markdown}
     <div class="mb-8">
-      <MarkdownContent content={markdown} {blocks} {defaultColumns} pageId={currentPageId} {widgetIds} />
+      <MarkdownContent content={markdown} {blocks} {defaultColumns} pageId={currentPageId} {widgetIds} {statusIds} />
     </div>
   {/if}
 
   <!-- Services -->
   <main class="space-y-8">
     {#each services as group (group.name)}
-      <ContentGroup {group} {defaultColumns} pageId={currentPageId} {widgetIds} />
+      <ContentGroup {group} {defaultColumns} pageId={currentPageId} {widgetIds} {statusIds} />
     {/each}
 
     {#if services.length === 0 && !markdown}

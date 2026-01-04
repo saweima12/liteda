@@ -1,4 +1,4 @@
-import { readFile, readdir } from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { parse } from 'yaml';
 import { join } from 'path';
@@ -29,12 +29,12 @@ marked.setOptions({
 
 async function loadYamlFile<T>(filename: string, schema: { parse: (data: unknown) => T }, defaultValue: T): Promise<T> {
   const filepath = join(CONFIG_DIR, filename);
-  
+
   if (!existsSync(filepath)) {
     console.warn(`Config file not found: ${filepath}, using defaults`);
     return defaultValue;
   }
-  
+
   try {
     const content = await readFile(filepath, 'utf-8');
     const parsed = parse(content);
@@ -52,15 +52,15 @@ export async function loadSettings(): Promise<Settings> {
 // Load a specific page content (supports .yaml and .md)
 export async function loadPageContent(file: string): Promise<PageContent> {
   const filepath = join(CONFIG_DIR, file);
-  
+
   if (!existsSync(filepath)) {
     return { services: [] };
   }
-  
+
   try {
     const content = await readFile(filepath, 'utf-8');
     const isMarkdown = file.endsWith('.md');
-    
+
     if (isMarkdown) {
       return parseMarkdownPage(content);
     } else {
@@ -75,25 +75,25 @@ export async function loadPageContent(file: string): Promise<PageContent> {
 // Parse YAML page file
 function parseYamlPage(content: string): PageContent {
   const parsed = parse(content);
-  
+
   // Page file can be either:
   // 1. Array of service groups (legacy format, now just "groups")
   // 2. Object with services
   if (Array.isArray(parsed)) {
     return { services: servicesFileSchema.parse(parsed) };
   }
-  
+
   return pageContentSchema.parse(parsed);
 }
 
 // Parse Markdown page file with frontmatter
 function parseMarkdownPage(content: string): PageContent {
   const { data: frontmatter, content: markdownBody } = matter(content);
-  
+
   // Parse frontmatter for services
   let services: ServiceGroup[] = [];
   let blocks: Record<string, BlockDefinition> | undefined;
-  
+
   if (frontmatter.services) {
     try {
       services = servicesFileSchema.parse(frontmatter.services);
@@ -113,16 +113,16 @@ function parseMarkdownPage(content: string): PageContent {
       console.warn('Invalid blocks in frontmatter:', e);
     }
   }
-  
+
   // Process markdown body - convert ::: block:xxx ::: to placeholder divs
   const processedMarkdown = markdownBody
     .replace(/::: block:(\w+) :::/g, '<div data-block="$1"></div>');
-  
+
   // Render markdown body to HTML
-  const markdown = processedMarkdown.trim() 
+  const markdown = processedMarkdown.trim()
     ? marked.parse(processedMarkdown) as string
     : undefined;
-  
+
   return { services, markdown, blocks };
 }
 
@@ -138,12 +138,12 @@ function getDefaultPages(hasServices: boolean): Page[] {
 export async function loadAllPages(settings: Settings): Promise<Map<string, PageContent>> {
   const pages = settings.pages || getDefaultPages(existsSync(join(CONFIG_DIR, 'services.yaml')));
   const pagesContent = new Map<string, PageContent>();
-  
+
   for (const page of pages) {
     const content = await loadPageContent(page.file);
     pagesContent.set(page.id, content);
   }
-  
+
   return pagesContent;
 }
 
@@ -151,7 +151,7 @@ export async function loadConfig(): Promise<Config> {
   const [settings] = await Promise.all([
     loadSettings(),
   ]);
-  
+
   return configSchema.parse({
     settings,
   });
@@ -161,11 +161,17 @@ export function getConfigDir(): string {
   return CONFIG_DIR;
 }
 
+import type { StatusCheckFullConfig } from '$lib/status-check';
+
 /** Widget ID mapping: widgetId -> full config (including vars) */
 export interface WidgetRegistry {
   widgets: Map<string, { type: string; interval?: number; vars?: Record<string, unknown> }>;
   /** Maps service to its widget ID */
   serviceWidgetIds: Map<string, string>;
+  /** Maps service to its status check ID */
+  statusCheckIds: Map<string, string>;
+  /** Status check configs */
+  statusChecks: Map<string, StatusCheckFullConfig>;
 }
 
 /**
@@ -178,19 +184,51 @@ export function extractWidgets(
 ): WidgetRegistry {
   const widgets = new Map<string, { type: string; interval?: number; vars?: Record<string, unknown> }>();
   const serviceWidgetIds = new Map<string, string>();
+  const statusCheckIds = new Map<string, string>();
+  const statusChecks = new Map<string, StatusCheckFullConfig>();
   let widgetCounter = 0;
+  let statusCheckCounter = 0;
 
   function processItem(item: ServiceItem, pathPrefix: string) {
+    const serviceKey = `${pathPrefix}:${item.name}`;
+
+    // Process widget
     if (item.widget) {
       const widgetId = `widget-${++widgetCounter}`;
-      const serviceKey = `${pathPrefix}:${item.name}`;
-      
+
       widgets.set(widgetId, {
         type: item.widget.type,
         interval: item.widget.interval,
         vars: item.widget.vars,
       });
       serviceWidgetIds.set(serviceKey, widgetId);
+    }
+
+    // Process status check (only if no widget - widgets provide their own status)
+    if (item.statuscheck && !item.widget) {
+      const statusCheckId = `status-${++statusCheckCounter}`;
+
+      // Normalize config
+      const config: StatusCheckFullConfig = item.statuscheck === true
+        ? {
+          url: item.url || '',
+          interval: 60000,
+          timeout: 5000,
+          method: 'HEAD',
+          expectedStatus: 200,
+        }
+        : {
+          url: item.statuscheck.url || item.url || '',
+          interval: item.statuscheck.interval ?? 60000,
+          timeout: item.statuscheck.timeout ?? 5000,
+          method: item.statuscheck.method ?? 'HEAD',
+          expectedStatus: item.statuscheck.expectedStatus ?? 200,
+        };
+
+      if (config.url) {
+        statusChecks.set(statusCheckId, config);
+        statusCheckIds.set(serviceKey, statusCheckId);
+      }
     }
   }
 
@@ -230,5 +268,5 @@ export function extractWidgets(
     }
   }
 
-  return { widgets, serviceWidgetIds };
+  return { widgets, serviceWidgetIds, statusCheckIds, statusChecks };
 }

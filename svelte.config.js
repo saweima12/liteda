@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-node';
+import adapter from 'svelte-adapter-bun';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -7,7 +7,9 @@ const config = {
   kit: {
     adapter: adapter({
       out: 'build',
-      precompress: true
+      precompress: true,
+      // Suppress warnings for Node.js built-in modules
+      external: ['fs', 'fs/promises', 'path', 'url', 'stream', 'util', 'crypto', 'os']
     }),
     alias: {
       $components: 'src/lib/components',

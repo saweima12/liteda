@@ -10,6 +10,18 @@ export const widgetConfigSchema = z.object({
   vars: z.record(z.string(), z.unknown()).optional(),
 });
 
+// Status check configuration
+export const statusCheckConfigSchema = z.union([
+  z.literal(true), // Simple mode: use service url
+  z.object({
+    url: z.string().url().optional(), // Custom check URL
+    interval: z.number().optional().default(60000), // Check interval (ms)
+    timeout: z.number().optional().default(5000), // Timeout (ms)
+    method: z.enum(['GET', 'HEAD']).optional().default('HEAD'),
+    expectedStatus: z.number().optional().default(200),
+  }),
+]);
+
 // Service item schema (also used for bookmark items)
 export const serviceItemSchema = z.object({
   name: z.string(),
@@ -18,6 +30,7 @@ export const serviceItemSchema = z.object({
   description: z.string().optional(),
   target: z.enum(['_blank', '_self']).optional().default('_blank'),
   widget: widgetConfigSchema.optional(),
+  statuscheck: statusCheckConfigSchema.optional(),
 });
 
 // Inner group schema (for nested groups)
@@ -27,6 +40,7 @@ export const innerGroupSchema = z.object({
   type: z.enum(['services', 'bookmarks']).optional().default('services'),
   columns: z.number().min(1).max(6).optional(),
   equalHeight: z.boolean().optional().default(true),
+  showName: z.boolean().optional().default(true),
   items: z.array(serviceItemSchema),
 });
 
@@ -36,7 +50,8 @@ export const serviceGroupSchema = z.object({
   icon: z.string().optional(),
   type: z.enum(['services', 'bookmarks']).optional().default('services'),
   columns: z.number().min(1).max(6).optional(),
-  equalHeight: z.boolean().optional().default(true).optional(),
+  equalHeight: z.boolean().default(true).optional(),
+  showName: z.boolean().default(true).optional(),
   // Either items OR groups, not both
   items: z.array(serviceItemSchema).optional(),
   groups: z.array(innerGroupSchema).optional(),
@@ -110,6 +125,7 @@ export const configSchema = z.object({
 // Type exports
 export type AddonConfig = z.infer<typeof addonConfigSchema>;
 export type WidgetConfig = z.infer<typeof widgetConfigSchema>;
+export type StatusCheckConfig = z.infer<typeof statusCheckConfigSchema>;
 export type ServiceItem = z.infer<typeof serviceItemSchema>;
 export type InnerGroup = z.infer<typeof innerGroupSchema>;
 export type ServiceGroup = z.infer<typeof serviceGroupSchema>;

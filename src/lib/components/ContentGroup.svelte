@@ -8,15 +8,17 @@
     defaultColumns?: number;
     pageId?: string;
     widgetIds?: Record<string, string>;
+    statusIds?: Record<string, string>;
   }
 
-  let { group, defaultColumns = 3, pageId = '', widgetIds = {} }: Props = $props();
+  let { group, defaultColumns = 3, pageId = '', widgetIds = {}, statusIds = {} }: Props = $props();
 
   // Check if this is a nested group (has groups) or flat group (has items)
   const isNested = $derived(group.groups && group.groups.length > 0);
   const columns = $derived(group.columns ?? defaultColumns);
   const isBookmarks = $derived(group.type === 'bookmarks');
   const equalHeight = $derived(group.equalHeight ?? true);
+  const showName = $derived(group.showName ?? true);
 
   const gridCols: Record<number, string> = {
     1: 'grid-cols-1',
@@ -44,24 +46,33 @@
       : `${pageId}:${groupName}:${itemName}`;
     return widgetIds[key];
   }
+
+  function getStatusCheckId(groupName: string, itemName: string, innerGroupName?: string): string | undefined {
+    const key = innerGroupName 
+      ? `${pageId}:${groupName}:${innerGroupName}:${itemName}`
+      : `${pageId}:${groupName}:${itemName}`;
+    return statusIds[key];
+  }
 </script>
 
 {#if isNested}
   <!-- Nested group: outer group is a section header -->
   <section class="space-y-6">
-    <h2 class="text-xl font-bold text-foreground flex items-center gap-2 pb-1">
-      {#if group.icon}
-        <img
-          src={getIconUrl(group.icon)}
-          alt=""
-          class="w-6 h-6 object-contain"
-          onerror={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
-      {/if}
-      {group.name}
-    </h2>
+    {#if showName}
+      <h2 class="text-xl font-bold text-foreground flex items-center gap-2 pb-1">
+        {#if group.icon}
+          <img
+            src={getIconUrl(group.icon)}
+            alt=""
+            class="w-6 h-6 object-contain"
+            onerror={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        {/if}
+        {group.name}
+      </h2>
+    {/if}
 
     <!-- Inner groups grid - columns controls how groups are arranged -->
     <div class="grid gap-6 {gridCols[columns] || gridCols[3]}">
@@ -69,21 +80,24 @@
         {@const innerCols = innerGroup.columns ?? defaultColumns}
         {@const innerIsBookmarks = isInnerBookmarks(innerGroup)}
         {@const innerEqualHeight = innerGroup.equalHeight ?? true}
+        {@const innerShowName = innerGroup.showName ?? true}
         
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-foreground flex items-center gap-2">
-            {#if innerGroup.icon}
-              <img
-                src={getIconUrl(innerGroup.icon)}
-                alt=""
-                class="w-5 h-5 object-contain"
-                onerror={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            {/if}
-            {innerGroup.name}
-          </h3>
+          {#if innerShowName}
+            <h3 class="text-lg font-semibold text-foreground flex items-center gap-2">
+              {#if innerGroup.icon}
+                <img
+                  src={getIconUrl(innerGroup.icon)}
+                  alt=""
+                  class="w-5 h-5 object-contain"
+                  onerror={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              {/if}
+              {innerGroup.name}
+            </h3>
+          {/if}
 
           {#if innerIsBookmarks}
             <div class="flex flex-wrap gap-2">
@@ -110,7 +124,7 @@
           {:else}
             <div class="grid gap-4 {innerEqualHeight ? 'items-stretch' : 'items-start'} {gridCols[innerCols] || gridCols[1]}">
               {#each innerGroup.items as service (service.name)}
-                <ServiceCard {service} widgetId={getWidgetId(group.name, service.name, innerGroup.name)} equalHeight={innerEqualHeight} />
+                <ServiceCard {service} widgetId={getWidgetId(group.name, service.name, innerGroup.name)} statusCheckId={getStatusCheckId(group.name, service.name, innerGroup.name)} equalHeight={innerEqualHeight} />
               {/each}
             </div>
           {/if}
@@ -121,19 +135,21 @@
 {:else}
   <!-- Flat group: original behavior -->
   <section class="space-y-4">
-    <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
-      {#if group.icon}
-        <img
-          src={getIconUrl(group.icon)}
-          alt=""
-          class="w-5 h-5 object-contain"
-          onerror={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
-      {/if}
-      {group.name}
-    </h2>
+    {#if showName}
+      <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+        {#if group.icon}
+          <img
+            src={getIconUrl(group.icon)}
+            alt=""
+            class="w-5 h-5 object-contain"
+            onerror={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        {/if}
+        {group.name}
+      </h2>
+    {/if}
 
     {#if isBookmarks}
       <div class="flex flex-wrap gap-2">
@@ -160,7 +176,7 @@
     {:else}
       <div class="grid gap-4 {equalHeight ? 'items-stretch' : 'items-start'} {gridCols[columns] || gridCols[3]}">
         {#each group.items ?? [] as service (service.name)}
-          <ServiceCard {service} widgetId={getWidgetId(group.name, service.name)} {equalHeight} />
+          <ServiceCard {service} widgetId={getWidgetId(group.name, service.name)} statusCheckId={getStatusCheckId(group.name, service.name)} {equalHeight} />
         {/each}
       </div>
     {/if}

@@ -13,5 +13,26 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173
+  },
+  build: {
+    rollupOptions: {
+      external: [
+        // Node.js built-in modules (available in Bun runtime)
+        'fs',
+        'fs/promises',
+        'path',
+        'url',
+        'stream',
+        'util',
+        'events',
+        'buffer',
+        'crypto',
+        'os',
+        'net',
+        'tls',
+        'http',
+        'https',
+      ]
+    }
   }
 });

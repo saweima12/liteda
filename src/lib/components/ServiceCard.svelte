@@ -1,13 +1,15 @@
 <script lang="ts">
   import type { ServiceItem } from '$config';
-  import type { ClientWidgetConfig } from '$lib/widgets/types';
+  import type { ClientWidgetConfig, ServiceStatus } from '$lib/widgets/types';
   import { Card } from './ui';
   import WidgetContainer from './WidgetContainer.svelte';
+  import StatusIndicator from './StatusIndicator.svelte';
   import IconExternalLink from '~icons/lucide/external-link';
 
   interface Props {
     service: ServiceItem;
     widgetId?: string;
+    statusCheckId?: string;
     equalHeight?: boolean;
   }
 
@@ -18,11 +20,12 @@
     return `https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/${icon}.png`;
   }
 
-  let { service, widgetId, equalHeight = true }: Props = $props();
+  let { service, widgetId, statusCheckId, equalHeight = true }: Props = $props();
 
   const iconUrl = $derived(getIconUrl(service.icon));
   const hasUrl = $derived(!!service.url);
   const heightClass = $derived(equalHeight ? 'h-full' : '');
+  const hasStatusCheck = $derived(!!service.statuscheck);
 
   // Create client-safe widget config (no vars!)
   const clientWidgetConfig = $derived.by((): ClientWidgetConfig | undefined => {
@@ -33,10 +36,36 @@
       id: widgetId,
     };
   });
+
+  // Status from widget (passed up via event)
+  let widgetStatus = $state<ServiceStatus | null>(null);
+  let widgetLatency = $state<number | null>(null);
+
+  function handleWidgetStatus(event: CustomEvent<{ status: ServiceStatus; latency: number | null }>) {
+    widgetStatus = event.detail.status;
+    widgetLatency = event.detail.latency;
+  }
+
+  // Determine if we should show status indicator
+  // Show if: has widget OR has statusCheck
+  const showStatus = $derived(!!clientWidgetConfig || hasStatusCheck);
 </script>
 
 {#snippet cardContent()}
-  <div class="flex items-start gap-3">
+  <div class="flex items-start gap-3 relative">
+    <!-- Status Indicator (top right) -->
+    {#if showStatus}
+      <div class="absolute -top-1 -right-1">
+        {#if clientWidgetConfig}
+          <!-- Widget provides status -->
+          <StatusIndicator status={widgetStatus ?? 'unknown'} latency={widgetLatency} />
+        {:else if statusCheckId}
+          <!-- Standalone status check -->
+          <StatusIndicator checkId={statusCheckId} interval={typeof service.statuscheck === 'object' ? service.statuscheck.interval : 60000} />
+        {/if}
+      </div>
+    {/if}
+
     <!-- Icon -->
     {#if iconUrl}
       <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
@@ -75,7 +104,7 @@
       <!-- Widget -->
       {#if clientWidgetConfig}
         <div class="mt-3 pt-3 border-t border-border">
-          <WidgetContainer config={clientWidgetConfig} />
+          <WidgetContainer config={clientWidgetConfig} onStatus={handleWidgetStatus} />
         </div>
       {/if}
     </div>

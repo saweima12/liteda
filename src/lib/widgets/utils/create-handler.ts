@@ -3,6 +3,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import type { ZodType, z } from 'zod';
 import { getWidgetConfig } from '../config-store';
 import { cachedFetch } from './cache';
+import type { WidgetResponse, ServiceStatus } from '../types';
 
 export interface CreateHandlerOptions<TVars, TData> {
   /**
@@ -32,6 +33,7 @@ export interface CreateHandlerOptions<TVars, TData> {
  * - Automatic caching with TTL (prevents duplicate requests from multiple clients)
  * - Thundering herd prevention
  * - Zod validation for vars
+ * - Unified response format with status
  * 
  * @example
  * ```ts
@@ -82,10 +84,12 @@ export function createHandler<TVars = unknown, TData = unknown>(
     }
 
     // Determine cache TTL
-    // Priority: widget interval > handler option > default (5000ms)
-    const cacheTtl = config.interval ?? options.cacheTtl ??  5000;
+    // Priority: handler option > widget interval > default (5000ms)
+    const cacheTtl = options.cacheTtl ?? config.interval ?? 5000;
 
-    // Call the fetch function with caching
+    // Call the fetch function with caching and timing
+    const startTime = Date.now();
+    
     try {
       const fetchFn = () => options.fetch(vars, {
         id,
@@ -97,12 +101,26 @@ export function createHandler<TVars = unknown, TData = unknown>(
         ? await cachedFetch<TData>(id, fetchFn, cacheTtl)
         : await fetchFn();
 
-      return json(data);
+      const response: WidgetResponse<TData> = {
+        data,
+        status: 'online',
+        latency: Date.now() - startTime,
+        checkedAt: Date.now(),
+      };
+
+      return json(response);
     } catch (e) {
       console.error(`Widget ${config.type} fetch error:`, e);
-      throw error(500, {
-        message: e instanceof Error ? e.message : 'Failed to fetch widget data',
-      });
+      
+      // Return offline status instead of throwing
+      const response: WidgetResponse<null> = {
+        data: null,
+        status: 'offline',
+        latency: Date.now() - startTime,
+        checkedAt: Date.now(),
+      };
+      
+      return json(response);
     }
   };
 }
