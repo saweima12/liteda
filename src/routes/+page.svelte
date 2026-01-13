@@ -4,6 +4,7 @@
   import type { PageData } from './$types';
   import { ContentGroup, PageTabs, MarkdownContent, Bar } from '$components';
   import IconSettings from '~icons/lucide/settings';
+  import { t } from '$lib/i18n';
 
   let { data }: { data: PageData } = $props();
 
@@ -115,9 +116,9 @@
     {#if services.length === 0 && !markdown}
       <div class="text-center py-16">
         <IconSettings class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h2 class="text-lg font-medium text-foreground mb-2">No content configured</h2>
+        <h2 class="text-lg font-medium text-foreground mb-2">{$t('common.empty.no_content')}</h2>
         <p class="text-muted-foreground">
-          Add content to your page configuration file
+          {$t('common.empty.add_content')}
         </p>
       </div>
     {/if}
@@ -125,6 +126,6 @@
 
   <!-- Footer -->
   <footer class="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-    <p>Liteda • Built with SvelteKit</p>
+    <p>{$t('common.footer')}</p>
   </footer>
 </div>

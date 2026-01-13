@@ -1,0 +1,51 @@
+{
+  "proxmox": {
+    "description": "Proxmox VE cluster status",
+    "labels": {
+      "vms": "VMs",
+      "lxc": "LXC",
+      "cpu": "CPU",
+      "mem": "MEM"
+    }
+  },
+  "portainer": {
+    "description": "Portainer container status",
+    "labels": {
+      "running": "Running",
+      "stopped": "Stopped",
+      "total": "Total"
+    }
+  },
+  "adguard": {
+    "description": "AdGuard Home DNS statistics",
+    "labels": {
+      "queries": "Queries",
+      "blocked": "Blocked",
+      "filtered": "Filtered",
+      "latency": "Latency"
+    }
+  },
+  "cloudflared": {
+    "description": "Cloudflare Tunnel status",
+    "labels": {
+      "status": "Status",
+      "originIp": "Origin IP"
+    }
+  },
+  "nginx-proxy-manager": {
+    "description": "Nginx Proxy Manager proxy hosts",
+    "labels": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "total": "Total"
+    }
+  },
+  "demo": {
+    "description": "Demo widget showing mock data with polling",
+    "labels": {
+      "random": "Random",
+      "apiKey": "API Key",
+      "endpoint": "Endpoint"
+    }
+  }
+}

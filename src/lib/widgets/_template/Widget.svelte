@@ -1,12 +1,13 @@
 <!--
   Widget Template - Widget.svelte
-  
+
   UI component for rendering widget data
 -->
 <script lang="ts">
   import type { ClientWidgetConfig } from '../types';
   import widgetDef from './meta';
   import { useWidget } from '../utils';
+  import { wt } from '../utils/i18n';
   import { Block, Row, Cell, Status, Metric, Progress } from '$components/widget-ui';
   import { Skeleton } from '$components/ui';
   import IconAlertCircle from '~icons/lucide/alert-circle';
@@ -19,6 +20,9 @@
 
   // Don't destructure - it breaks reactivity
   const widget = useWidget(widgetDef, () => config);
+
+  // Create translation function for this widget
+  const tw = wt(widgetDef.name);
 </script>
 
 <Block>
@@ -49,12 +53,17 @@
     <!-- Example: use Progress for progress bar -->
     <!-- <Progress label="Usage" value={widget.data.value} max={100} /> -->
     
-    <!-- Example: use Grid layout -->
+    <!-- Example: use Grid layout with i18n -->
     <!-- <Block layout="grid" columns={2}>
-      <Cell label="Label1">{widget.data.value1}</Cell>
-      <Cell label="Label2">{widget.data.value2}</Cell>
+      <Cell label={$tw('labels.label1')}>{widget.data.value1}</Cell>
+      <Cell label={$tw('labels.label2')}>{widget.data.value2}</Cell>
     </Block> -->
-    
+
+    <!-- Remember to add translations to:
+         - src/lib/i18n/translations/en/widgets.json
+         - src/lib/i18n/translations/zh/widgets.json
+    -->
+
     <Row label="Message" value="Widget is working!" />
   {/if}
 </Block>

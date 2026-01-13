@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ClientWidgetConfig, ServiceStatus } from '$lib/widgets/types';
   import { getWidgetComponent } from '$lib/widgets';
+  import { t } from '$lib/i18n';
   import IconAlertCircle from '~icons/lucide/alert-circle';
 
   interface Props {
@@ -18,6 +19,6 @@
 {:else}
   <div class="flex items-center gap-2 text-sm text-muted-foreground">
     <IconAlertCircle class="h-4 w-4" />
-    <span>Unknown widget: {config.type}</span>
+    <span>{$t('common.errors.unknown_widget', { type: config.type })}</span>
   </div>
 {/if}

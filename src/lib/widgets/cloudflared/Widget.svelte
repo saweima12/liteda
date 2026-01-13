@@ -2,6 +2,7 @@
   import type { ClientWidgetConfig } from '../types';
   import widgetDef from './meta';
   import { useWidget } from '../utils';
+  import { wt } from '../utils/i18n';
   import { Block, Cell } from '$components/widget-ui';
   import { Skeleton } from '$components/ui';
   import IconAlertCircle from '~icons/lucide/alert-circle';
@@ -13,6 +14,7 @@
   let { config }: Props = $props();
 
   const widget = useWidget(widgetDef, () => config);
+  const tw = wt(widgetDef.name);
 </script>
 
 <Block>
@@ -28,8 +30,8 @@
     </div>
   {:else if widget.data}
     <Block layout="grid" columns={2}>
-      <Cell label="Status">{widget.data.status}</Cell>
-      <Cell label="Origin IP">{widget.data.originIp ?? 'N/A'}</Cell>
+      <Cell label={$tw('labels.status')}>{widget.data.status}</Cell>
+      <Cell label={$tw('labels.originIp')}>{widget.data.originIp ?? 'N/A'}</Cell>
     </Block>
   {/if}
 </Block>

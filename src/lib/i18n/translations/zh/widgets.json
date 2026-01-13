@@ -1,0 +1,51 @@
+{
+  "proxmox": {
+    "description": "Proxmox VE 叢集狀態",
+    "labels": {
+      "vms": "虛擬機",
+      "lxc": "容器",
+      "cpu": "CPU",
+      "mem": "記憶體"
+    }
+  },
+  "portainer": {
+    "description": "Portainer 容器狀態",
+    "labels": {
+      "running": "運行中",
+      "stopped": "已停止",
+      "total": "總計"
+    }
+  },
+  "adguard": {
+    "description": "AdGuard Home DNS 統計",
+    "labels": {
+      "queries": "查詢數",
+      "blocked": "已攔截",
+      "filtered": "過濾率",
+      "latency": "延遲"
+    }
+  },
+  "cloudflared": {
+    "description": "Cloudflare 隧道狀態",
+    "labels": {
+      "status": "狀態",
+      "originIp": "來源 IP"
+    }
+  },
+  "nginx-proxy-manager": {
+    "description": "Nginx Proxy Manager 代理主機",
+    "labels": {
+      "enabled": "已啟用",
+      "disabled": "已停用",
+      "total": "總計"
+    }
+  },
+  "demo": {
+    "description": "展示輪詢模擬數據的示範小工具",
+    "labels": {
+      "random": "隨機值",
+      "apiKey": "API 金鑰",
+      "endpoint": "端點"
+    }
+  }
+}

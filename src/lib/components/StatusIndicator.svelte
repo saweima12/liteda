@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ServiceStatus } from '$lib/widgets/types';
+  import { t } from '$lib/i18n';
 
   interface Props {
     // Direct status (from widget)
@@ -58,7 +59,7 @@
 
   // Tooltip text
   const tooltipText = $derived(() => {
-    const statusLabel = displayStatus === 'online' ? 'Online' : displayStatus === 'offline' ? 'Offline' : 'Unknown';
+    const statusLabel = $t(`common.status.${displayStatus}`);
     const latencyText = displayLatency !== null ? ` · ${displayLatency}ms` : '';
     const timeText = lastChecked ? ` · ${formatTimeAgo(lastChecked)}` : '';
     return `${statusLabel}${latencyText}${timeText}`;
@@ -66,10 +67,10 @@
 
   function formatTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 60) return $t('common.time.seconds_ago', { count: seconds });
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    return `${Math.floor(minutes / 60)}h ago`;
+    if (minutes < 60) return $t('common.time.minutes_ago', { count: minutes });
+    return $t('common.time.hours_ago', { count: Math.floor(minutes / 60) });
   }
 </script>
 

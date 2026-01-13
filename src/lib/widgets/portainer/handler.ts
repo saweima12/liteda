@@ -1,10 +1,5 @@
 import { createHandler } from '../utils/create-handler';
 import widget from './meta';
-import https from 'node:https';
-
-const agent = new https.Agent({
-  rejectUnauthorized: false,
-});
 
 interface Container {
   Id: string;
@@ -17,15 +12,17 @@ export const POST = createHandler({
 
   async fetch(vars) {
     const baseUrl = vars.url.replace(/\/+$/, '');
-    
+
     const response = await fetch(
       `${baseUrl}/api/endpoints/${vars.env}/docker/containers/json?all=1`,
       {
         headers: {
           'X-Api-Key': vars.key,
         },
-        // @ts-ignore
-        agent,
+        // @ts-expect-error - Bun-specific TLS option for self-signed certs
+        tls: {
+          rejectUnauthorized: false,
+        },
       }
     );
 

@@ -1,0 +1,24 @@
+{
+  "status": {
+    "online": "在線",
+    "offline": "離線",
+    "unknown": "未知",
+    "healthy": "健康",
+    "warning": "警告",
+    "error": "錯誤"
+  },
+  "time": {
+    "seconds_ago": "{{count}} 秒前",
+    "minutes_ago": "{{count}} 分鐘前",
+    "hours_ago": "{{count}} 小時前"
+  },
+  "errors": {
+    "unknown_widget": "未知小工具：{{type}}",
+    "unknown_addon": "未知擴充功能：{{type}}"
+  },
+  "empty": {
+    "no_content": "尚未設定內容",
+    "add_content": "請在配置檔案中添加內容"
+  },
+  "footer": "Liteda • 使用 SvelteKit 構建"
+}

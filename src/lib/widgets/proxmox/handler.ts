@@ -25,8 +25,10 @@ export const POST = createHandler({
         Authorization: `PVEAPIToken=${vars.username}=${vars.password}`,
       },
       // Skip SSL verification for self-signed certs (common in homelabs)
-      // @ts-ignore - Node.js specific option
-      rejectUnauthorized: false,
+      // @ts-expect-error - Bun-specific TLS option
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
     if (!response.ok) {

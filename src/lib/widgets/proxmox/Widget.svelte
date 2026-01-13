@@ -2,17 +2,19 @@
     import type { ClientWidgetConfig } from '../types';
     import widgetDef from './meta';
     import { useWidget } from '../utils';
+    import { wt } from '../utils/i18n';
     import { Block, Row, Cell, Progress } from '$components/widget-ui';
     import { Skeleton } from '$components/ui';
     import IconAlertCircle from '~icons/lucide/alert-circle';
-  
+
     interface Props {
       config: ClientWidgetConfig;
     }
-  
+
     let { config }: Props = $props();
-  
+
     const widget = useWidget(widgetDef, () => config);
+    const tw = wt(widgetDef.name);
   </script>
   
 <Block>
@@ -29,14 +31,14 @@
     </div>
 {:else if widget.data}
     <Block layout="grid" columns={4}>
-    <Cell label="VMs">
+    <Cell label={$tw('labels.vms')}>
         {widget.data.vms.running}/{widget.data.vms.total}
     </Cell>
-    <Cell label="LXC">
+    <Cell label={$tw('labels.lxc')}>
         {widget.data.lxc.running}/{widget.data.lxc.total}
     </Cell>
-    <Cell label="CPU">{widget.data.cpu}%</Cell>
-    <Cell label="MEM">{widget.data.mem}%</Cell>
+    <Cell label={$tw('labels.cpu')}>{widget.data.cpu}%</Cell>
+    <Cell label={$tw('labels.mem')}>{widget.data.mem}%</Cell>
     </Block>
 {/if}
 </Block>

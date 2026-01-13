@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { locales } from '$lib/i18n/locales';
 
 // Widget configuration schema
 // - type: widget type name
@@ -94,6 +95,9 @@ export const settingsSchema = z.object({
     columns: z.number().min(1).max(6).optional().default(3),
     style: z.enum(['grid', 'masonry']).optional().default('grid'),
     header: z.array(addonConfigSchema).optional(),
+  }).optional(),
+  i18n: z.object({
+    locale: z.enum(locales as [string, ...string[]]).optional().default('en'),
   }).optional(),
   pages: z.array(pageSchema).optional(),
 });

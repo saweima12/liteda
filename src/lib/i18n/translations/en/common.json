@@ -1,0 +1,24 @@
+{
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "unknown": "Unknown",
+    "healthy": "Healthy",
+    "warning": "Warning",
+    "error": "Error"
+  },
+  "time": {
+    "seconds_ago": "{{count}}s ago",
+    "minutes_ago": "{{count}}m ago",
+    "hours_ago": "{{count}}h ago"
+  },
+  "errors": {
+    "unknown_widget": "Unknown widget: {{type}}",
+    "unknown_addon": "Unknown addon: {{type}}"
+  },
+  "empty": {
+    "no_content": "No content configured",
+    "add_content": "Add content to your page configuration file"
+  },
+  "footer": "Liteda • Built with SvelteKit"
+}
