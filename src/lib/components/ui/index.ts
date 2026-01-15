@@ -1,11 +1,53 @@
 // Utils
 export { cn } from './utils';
 
-// Components
-export { default as Button, buttonVariants, type ButtonProps } from './button.svelte';
-export { default as Card, type CardProps } from './card.svelte';
-export { default as Badge, badgeVariants, type BadgeProps } from './badge.svelte';
-export { default as Skeleton, type SkeletonProps } from './skeleton.svelte';
+// Button
+export { Button, buttonVariants, type ButtonProps, type ButtonSize, type ButtonVariant } from './button';
+
+// Card
+export {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from './card';
+
+// Badge
+export { Badge, badgeVariants, type BadgeVariant } from './badge';
+
+// Skeleton
+export { Skeleton } from './skeleton';
 
 // Tabs
-export * from './tabs';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
+
+// Command
+export {
+	Command,
+	CommandDialog,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandLinkItem,
+	CommandList,
+	CommandSeparator,
+	CommandShortcut,
+	CommandLoading,
+} from './command';
+
+// Dialog
+export {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogOverlay,
+	DialogPortal,
+	DialogTitle,
+	DialogTrigger,
+	DialogClose,
+} from './dialog';
