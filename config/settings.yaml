@@ -18,6 +18,14 @@ layout:
   header:
     - type: title
     - type: spacer
+    - type: resources
+      vars:
+        cpu: true
+        memory: true
+        disk: /
+        cputemp: true
+        refresh: 5000
+    - type: search
     - type: theme-switcher
 
 # Pages (optional - if not set, services.yaml is used as single page)
@@ -38,7 +46,6 @@ pages:
     name: Notes
     icon: folder
     file: pages/notes.md
-
 # Custom CSS (optional)
 # customCss: |
 #   .custom-class { color: red; }
