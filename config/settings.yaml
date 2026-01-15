@@ -18,6 +18,13 @@ layout:
   header:
     - type: title
     - type: spacer
+    - type: weather
+      vars:
+        latitude: 25.0330
+        longitude: 121.5654
+        label: "Taipei"
+        units: metric
+        refresh: 600000
     - type: resources
       vars:
         cpu: true
