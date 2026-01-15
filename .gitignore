@@ -1,28 +1,48 @@
 # Dependencies
 node_modules/
+.pnp
+.pnp.js
 
 # Build
 build/
 .svelte-kit/
+dist/
+.output/
 
 # Environment
 .env
 .env.*
 !.env.example
+!.env.template
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+*.tmp
 
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+*.lcov
+.nyc_output/
 
 # Config secrets (keep examples)
 config/*.local.yaml
+
+# Temporary files
+*.cache
+.temp/
