@@ -47,5 +47,66 @@
       "apiKey": "API Key",
       "endpoint": "Endpoint"
     }
+  },
+  "uptime-kuma": {
+    "description": "Uptime Kuma status page monitor",
+    "labels": {
+      "up": "Up",
+      "down": "Down",
+      "uptime": "Uptime",
+      "incident": "Incident"
+    }
+  },
+  "jellyfin": {
+    "description": "Jellyfin media server statistics",
+    "labels": {
+      "movies": "Movies",
+      "series": "Series",
+      "episodes": "Episodes",
+      "songs": "Songs",
+      "streams": "Streams"
+    }
+  },
+  "plex": {
+    "description": "Plex media server statistics",
+    "labels": {
+      "movies": "Movies",
+      "shows": "Shows",
+      "streams": "Streams"
+    }
+  },
+  "sonarr": {
+    "description": "Sonarr TV show management",
+    "labels": {
+      "wanted": "Wanted",
+      "queued": "Queued",
+      "series": "Series"
+    }
+  },
+  "radarr": {
+    "description": "Radarr movie management",
+    "labels": {
+      "wanted": "Wanted",
+      "queued": "Queued",
+      "movies": "Movies"
+    }
+  },
+  "qbittorrent": {
+    "description": "qBittorrent download client",
+    "labels": {
+      "download": "Down",
+      "upload": "Up",
+      "active": "Active",
+      "seeding": "Seeding"
+    }
+  },
+  "grafana": {
+    "description": "Grafana dashboard statistics",
+    "labels": {
+      "dashboards": "Dashboards",
+      "datasources": "Sources",
+      "alerts": "Alerts",
+      "triggered": "Triggered"
+    }
   }
 }

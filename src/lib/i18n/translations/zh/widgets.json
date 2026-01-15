@@ -47,5 +47,66 @@
       "apiKey": "API 金鑰",
       "endpoint": "端點"
     }
+  },
+  "uptime-kuma": {
+    "description": "Uptime Kuma 狀態頁監控",
+    "labels": {
+      "up": "正常",
+      "down": "離線",
+      "uptime": "運行時間",
+      "incident": "事件"
+    }
+  },
+  "jellyfin": {
+    "description": "Jellyfin 媒體伺服器統計",
+    "labels": {
+      "movies": "電影",
+      "series": "影集",
+      "episodes": "集數",
+      "songs": "歌曲",
+      "streams": "串流"
+    }
+  },
+  "plex": {
+    "description": "Plex 媒體伺服器統計",
+    "labels": {
+      "movies": "電影",
+      "shows": "節目",
+      "streams": "串流"
+    }
+  },
+  "sonarr": {
+    "description": "Sonarr 影集管理",
+    "labels": {
+      "wanted": "缺失",
+      "queued": "佇列",
+      "series": "影集"
+    }
+  },
+  "radarr": {
+    "description": "Radarr 電影管理",
+    "labels": {
+      "wanted": "缺失",
+      "queued": "佇列",
+      "movies": "電影"
+    }
+  },
+  "qbittorrent": {
+    "description": "qBittorrent 下載客戶端",
+    "labels": {
+      "download": "下載",
+      "upload": "上傳",
+      "active": "活躍",
+      "seeding": "做種"
+    }
+  },
+  "grafana": {
+    "description": "Grafana 儀表板統計",
+    "labels": {
+      "dashboards": "儀表板",
+      "datasources": "資料源",
+      "alerts": "告警",
+      "triggered": "觸發中"
+    }
   }
 }
