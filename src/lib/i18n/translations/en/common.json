@@ -20,5 +20,9 @@
     "no_content": "No content configured",
     "add_content": "Add content to your page configuration file"
   },
+  "search": {
+    "placeholder": "Search services...",
+    "no_results": "No results found"
+  },
   "footer": "Liteda • Built with SvelteKit"
 }

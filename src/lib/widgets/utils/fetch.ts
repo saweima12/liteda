@@ -1,3 +1,5 @@
+import { browser } from '$app/environment';
+
 export interface FetchWidgetOptions {
   signal?: AbortSignal;
 }
@@ -23,6 +25,10 @@ export async function fetchWidget<T>(
   body?: unknown,
   options?: FetchWidgetOptions
 ): Promise<T> {
+  if (!browser) {
+    throw new WidgetFetchError('fetchWidget can only be called in browser');
+  }
+
   const res = await fetch(`/api/widgets/${type}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

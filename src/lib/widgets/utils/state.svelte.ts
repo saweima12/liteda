@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { fetchWidget, createAbortController } from './fetch';
 import type { ClientWidgetConfig, WidgetResponse, ServiceStatus } from '../types';
 import type { ZodType } from 'zod';
@@ -128,8 +129,10 @@ export function useWidget<TData>(
     }
   }
 
-  // Auto lifecycle with $effect
+  // Auto lifecycle with $effect (client-side only)
   $effect(() => {
+    if (!browser) return;
+
     // Start polling
     refresh();
     intervalId = setInterval(refresh, getConfig().interval || 10000);

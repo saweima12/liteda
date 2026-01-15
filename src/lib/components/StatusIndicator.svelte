@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import type { ServiceStatus } from '$lib/widgets/types';
   import { t } from '$lib/i18n';
 
@@ -41,9 +42,9 @@
     }
   }
 
-  // Auto-fetch for standalone mode
+  // Auto-fetch for standalone mode (client-side only)
   $effect(() => {
-    if (checkId) {
+    if (browser && checkId) {
       fetchStatus();
       const id = setInterval(fetchStatus, interval);
       return () => clearInterval(id);

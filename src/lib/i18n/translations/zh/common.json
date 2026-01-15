@@ -20,5 +20,9 @@
     "no_content": "尚未設定內容",
     "add_content": "請在配置檔案中添加內容"
   },
+  "search": {
+    "placeholder": "搜尋服務...",
+    "no_results": "找不到結果"
+  },
   "footer": "Liteda • 使用 SvelteKit 構建"
 }

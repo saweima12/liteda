@@ -5,6 +5,7 @@
   import { ContentGroup, PageTabs, MarkdownContent, Bar } from '$components';
   import IconSettings from '~icons/lucide/settings';
   import { t } from '$lib/i18n';
+  import { searchStore, buildSearchIndex } from '$lib/stores/search.svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -20,6 +21,13 @@
   // Using a getter so derived value stays reactive
   setContext('settings', {
     get current() { return settings; }
+  });
+
+  // Build search index when data is available
+  $effect(() => {
+    if (browser && pages && pagesList) {
+      searchStore.items = buildSearchIndex(pages, pagesList);
+    }
   });
 
   // Default header if not configured
