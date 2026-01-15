@@ -124,7 +124,9 @@ bun run check           # Run svelte-check
 
 ### File Organization
 - Widgets: `src/lib/widgets/[name]/` with `meta.ts`, `handler.ts`, `Widget.svelte`
-- Addons: `src/lib/addons/[name]/` with `meta.ts`, `Addon.svelte`
+- Addons: `src/lib/addons/[name]/` with `meta.ts`, `Addon.svelte` (optionally `types.ts`, `utils.ts`)
+  - Addons with API calls: Add API route in `src/routes/api/[name]/+server.ts`
+  - Example: weather addon has `types.ts`, `utils.ts`, and `/api/weather` route
 - Config: `src/lib/config/` with loader, schema, cache
 - Routes: SvelteKit conventions (`+page.svelte`, `+page.server.ts`, etc.)
 - Components: Reusable in `src/lib/components/ui/` (shadcn-svelte) and `src/lib/components/widget-ui/`
@@ -145,3 +147,73 @@ bun run check           # Run svelte-check
 - Use `$app/stores` for page data and navigation
 - Use `onMount` for browser-only side effects with cleanup
 - Use `window.addEventListener` in `onMount` with proper cleanup
+
+### Addon System Patterns
+
+**Built-in Addons:**
+- `title` - Display site title
+- `spacer` - Flexible spacer (pushes subsequent items to the right)
+- `theme-switcher` - Light/dark theme toggle
+- `search` - Global search
+- `resources` - System resources monitor
+- `weather` - Current weather display with popover
+
+**Creating an addon:**
+1. Create folder: `src/lib/addons/my-addon/`
+2. Define `meta.ts` with `defineAddon()`
+3. Create `Addon.svelte` with UI
+4. (Optional) Add `types.ts` for Zod schemas if needed
+5. (Optional) Add `utils.ts` for helper functions
+6. (Optional) Add API route in `src/routes/api/my-addon/+server.ts` if addon needs server-side data
+7. No registration needed - auto-discovered via Vite glob
+
+**Addon with API pattern (like weather):**
+```ts
+// src/lib/addons/weather/types.ts
+export const weatherVarsSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  label: z.string().optional(),
+  units: z.enum(['metric', 'imperial']).default('metric'),
+  refresh: z.number().default(600000), // Client-side refresh interval
+  cache: z.number().default(5),        // Server-side cache TTL (minutes)
+});
+
+// src/routes/api/weather/+server.ts
+export const GET: RequestHandler = async ({ url }) => {
+  // Parse params, check cache, fetch data, return JSON
+};
+
+// src/lib/addons/weather/Addon.svelte
+$effect(() => {
+  if (!browser) return;
+  fetchWeather();
+  const interval = setInterval(fetchWeather, refresh);
+  return () => clearInterval(interval);
+});
+```
+
+**Addon layout patterns:**
+```yaml
+# Resources on left, others on right
+header:
+  - type: resources
+  - type: spacer        # Pushes to right
+  - type: weather
+  - type: search
+  - type: theme-switcher
+
+# All items on right
+header:
+  - type: spacer
+  - type: weather
+  - type: theme-switcher
+
+# Three sections
+header:
+  - type: resources
+  - type: spacer
+  - type: weather
+  - type: spacer
+  - type: theme-switcher
+```

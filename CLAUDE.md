@@ -73,10 +73,44 @@ Addons are header bar components that use auto-discovery similar to widgets:
 ```
 src/lib/addons/my-addon/
 ├── meta.ts      # Addon definition with defineAddon()
+├── types.ts     # TypeScript types + Zod schemas (optional)
+├── utils.ts     # Helper functions (optional)
 └── Addon.svelte # UI component
 ```
 
 Auto-scanned via `src/lib/addons/registry.ts`. Configured in `settings.yaml` under `layout.header`.
+
+**Built-in Addons:**
+- `title` - Display site title from settings
+- `spacer` - Flexible spacer (use `flex-1` to push items to the right)
+- `theme-switcher` - Toggle between light/dark theme
+- `search` - Global search with keyboard shortcuts (Cmd+K / Ctrl+K)
+- `resources` - System resources monitor (CPU, memory, disk, temperature)
+- `weather` - Current weather from Open-Meteo API with clickable popover for details
+
+**Weather Addon Example:**
+```yaml
+layout:
+  header:
+    - type: resources      # Left side
+    - type: spacer         # Push to right
+    - type: weather        # Right side
+      vars:
+        latitude: 25.0330
+        longitude: 121.5654
+        label: "Taipei"
+        units: metric      # or imperial
+        refresh: 600000    # 10 minutes
+        cache: 5           # 5 minutes server cache
+    - type: search
+    - type: theme-switcher
+```
+
+**Addon Patterns:**
+- Addons with API calls should use dedicated API routes (e.g., `/api/weather`, `/api/resources`)
+- Client-side polling using `$effect` with cleanup
+- Use `browser` check before fetching data
+- Support configurable refresh intervals via `vars`
 
 ### Server-Side Rendering & Caching
 
@@ -180,8 +214,23 @@ docker compose up -d
 **Adding a New Addon:**
 1. Create folder: `src/lib/addons/my-addon/`
 2. Define with `defineAddon()` in `meta.ts`
-3. Create UI in `Addon.svelte`
-4. Configure in `settings.yaml` under `layout.header`
+3. (Optional) Create `types.ts` if addon needs Zod schemas
+4. (Optional) Create `utils.ts` for helper functions
+5. (Optional) Create API route if addon needs server-side data fetching
+6. Create UI in `Addon.svelte`
+7. Configure in `settings.yaml` under `layout.header`
+
+**Addon with API Example (Weather):**
+```
+src/lib/addons/weather/
+├── types.ts           # Zod schemas, constants, TypeScript types
+├── utils.ts           # Helper functions (formatting, mapping)
+├── Addon.svelte       # UI component with client-side polling
+└── meta.ts            # Addon registration
+
+src/routes/api/weather/
+└── +server.ts         # GET handler with caching
+```
 
 **Modifying Config Schema:**
 - Update `src/lib/config/schema.ts` with Zod schemas
