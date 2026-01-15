@@ -9,9 +9,11 @@ A lightweight, memory-efficient dashboard for your homelab. Built with SvelteKit
 - 🚀 **Lightweight** - ~50-80MB base memory usage
 - ⚡ **Fast** - Built with SvelteKit and Svelte 5 for snappy performance
 - 📄 **Simple Config** - YAML files + Markdown pages, no database needed
+- ✨ **IDE Support** - JSON schema validation with autocompletion for configs
 - 🎨 **Customizable** - Themes, backgrounds, flexible header layout
 - 📱 **Multi-page** - Organize services into tabbed pages
 - 🔀 **SSR Proxy** - Server-side API calls, no CORS issues with your services
+- 🧩 **Extensible** - Widget system for monitoring popular homelab services
 
 ## Quick Start
 
@@ -35,12 +37,18 @@ All configuration files are in the `config/` directory:
 
 ```
 config/
+├── schemas/           # Auto-generated JSON schemas (run: bun run schema)
 ├── settings.yaml      # Global settings, theme, layout, header
 ├── services.yaml      # Default home page
 └── pages/             # Additional pages
     ├── media.yaml     # YAML page
     ├── infra.yaml
     └── notes.md       # Markdown page with frontmatter
+```
+
+**IDE Support**: Config files include JSON schema validation for autocompletion and error checking. Generate schemas with:
+```bash
+bun run schema
 ```
 
 ### settings.yaml
@@ -233,14 +241,13 @@ export const POST = createHandler({
 
 ### Built-in Widgets
 
-| Widget | Description |
-|--------|-------------|
-| `demo` | Demo/testing widget |
-| `portainer` | Docker container status |
-| `proxmox` | VM/LXC status |
-| `adguard` | AdGuard Home statistics |
-| `cloudflared` | Cloudflare Tunnel status |
-| `nginx-proxy-manager` | NPM proxy hosts/certificates |
+**12+ widgets available** covering common homelab services:
+
+- **Infrastructure**: Portainer, Proxmox, Nginx Proxy Manager, Cloudflare Tunnel
+- **Media**: Jellyfin, Plex, Sonarr, Radarr, qBittorrent
+- **Monitoring**: Uptime Kuma, Grafana, AdGuard Home
+
+> 📁 See all widgets in [`src/lib/widgets/`](src/lib/widgets/) directory
 
 ## Addons
 
@@ -256,20 +263,33 @@ src/lib/addons/my-addon/
 
 ### Built-in Addons
 
-| Addon | Description |
-|-------|-------------|
-| `title` | Display site title |
-| `spacer` | Flexible space (flex-grow) |
-| `theme-switcher` | Light/dark mode toggle |
+**6 addons available** for header customization:
 
-### Configuration
+- `title` - Display site title
+- `spacer` - Flexible space (pushes items to the right)
+- `theme-switcher` - Light/dark mode toggle
+- `search` - Global search with keyboard shortcuts (⌘K / Ctrl+K)
+- `resources` - System resources monitor (CPU, memory, disk, temp)
+- `weather` - Current weather display with detailed popover
+
+> 📁 See all addons in [`src/lib/addons/`](src/lib/addons/) directory
+
+### Header Configuration
+
+Customize your header bar with various addons:
 
 ```yaml
 layout:
   header:
-    - type: title
-    - type: spacer
-    - type: theme-switcher
+    - type: resources      # System monitor on the left
+    - type: spacer         # Push remaining items to the right
+    - type: weather        # Current weather
+      vars:
+        latitude: 25.0330
+        longitude: 121.5654
+        label: "Taipei"
+    - type: search         # Global search (⌘K)
+    - type: theme-switcher # Theme toggle
 ```
 
 ## Docker
