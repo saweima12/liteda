@@ -1,0 +1,1269 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Liteda services schema",
+  "description": "Liteda services/pages YAML configuration",
+  "$ref": "#/definitions/services",
+  "definitions": {
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Group name"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Group icon"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "services",
+              "bookmarks"
+            ],
+            "default": "services",
+            "description": "Display type"
+          },
+          "columns": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 6,
+            "description": "Number of columns (1-6)"
+          },
+          "equalHeight": {
+            "type": "boolean",
+            "default": true,
+            "description": "Equal height items"
+          },
+          "showName": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show group name"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Service display name"
+                },
+                "icon": {
+                  "type": "string",
+                  "description": "Icon name from Dashboard Icons or Lucide"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "description": "Service URL"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Short description"
+                },
+                "target": {
+                  "type": "string",
+                  "enum": [
+                    "_blank",
+                    "_self"
+                  ],
+                  "default": "_blank",
+                  "description": "Link target"
+                },
+                "widget": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "demo"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "apiKey": {
+                              "type": "string"
+                            },
+                            "endpoint": {
+                              "type": "string",
+                              "format": "uri"
+                            }
+                          },
+                          "additionalProperties": false,
+                          "description": "Demo widget showing mock data with polling"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "uptime-kuma"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "slug": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "slug"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Uptime Kuma status page monitor"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "jellyfin"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "key": {
+                              "type": "string"
+                            },
+                            "showStreams": {
+                              "type": "boolean",
+                              "default": false
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "key"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Jellyfin media server statistics"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "adguard"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "username",
+                            "password"
+                          ],
+                          "additionalProperties": false,
+                          "description": "AdGuard Home DNS statistics"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "qbittorrent"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url"
+                          ],
+                          "additionalProperties": false,
+                          "description": "qBittorrent download client"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "proxmox"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            },
+                            "node": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "username",
+                            "password"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Proxmox VE cluster status"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "portainer"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "key": {
+                              "type": "string"
+                            },
+                            "env": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "key",
+                            "env"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Portainer container status"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "grafana"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Grafana dashboard statistics"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "radarr"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "key": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "key"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Radarr movie management"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "nginx-proxy-manager"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "username",
+                            "password"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Nginx Proxy Manager proxy hosts"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "cloudflared"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "accountId": {
+                              "type": "string"
+                            },
+                            "tunnelId": {
+                              "type": "string"
+                            },
+                            "key": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "accountId",
+                            "tunnelId",
+                            "key"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Cloudflare Tunnel status"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "plex"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "token": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "token"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Plex media server statistics"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "sonarr"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "key": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "key"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Sonarr TV show management"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ],
+                  "description": "Widget configuration"
+                },
+                "statuscheck": {
+                  "anyOf": [
+                    {
+                      "type": "boolean",
+                      "const": true,
+                      "description": "Simple mode: use service URL for health check"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "Custom health check URL"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "default": 60000,
+                          "description": "Check interval in milliseconds"
+                        },
+                        "timeout": {
+                          "type": "number",
+                          "default": 5000,
+                          "description": "Request timeout in milliseconds"
+                        },
+                        "method": {
+                          "type": "string",
+                          "enum": [
+                            "GET",
+                            "HEAD"
+                          ],
+                          "default": "HEAD",
+                          "description": "HTTP method"
+                        },
+                        "expectedStatus": {
+                          "type": "number",
+                          "default": 200,
+                          "description": "Expected HTTP status code"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "description": "Advanced status check configuration"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "description": "Service or bookmark item"
+            },
+            "description": "Items (use this OR groups, not both)"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Group name"
+                },
+                "icon": {
+                  "type": "string",
+                  "description": "Group icon"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "services",
+                    "bookmarks"
+                  ],
+                  "default": "services",
+                  "description": "Display type"
+                },
+                "columns": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 6,
+                  "description": "Number of columns (1-6)"
+                },
+                "equalHeight": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Equal height items"
+                },
+                "showName": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Show group name"
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Service display name"
+                      },
+                      "icon": {
+                        "type": "string",
+                        "description": "Icon name from Dashboard Icons or Lucide"
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Service URL"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Short description"
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          "_blank",
+                          "_self"
+                        ],
+                        "default": "_blank",
+                        "description": "Link target"
+                      },
+                      "widget": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "demo"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "apiKey": {
+                                    "type": "string"
+                                  },
+                                  "endpoint": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  }
+                                },
+                                "additionalProperties": false,
+                                "description": "Demo widget showing mock data with polling"
+                              }
+                            },
+                            "required": [
+                              "type"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "uptime-kuma"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "slug": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "slug"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Uptime Kuma status page monitor"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "jellyfin"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "showStreams": {
+                                    "type": "boolean",
+                                    "default": false
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "key"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Jellyfin media server statistics"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "adguard"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  },
+                                  "password": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "username",
+                                  "password"
+                                ],
+                                "additionalProperties": false,
+                                "description": "AdGuard Home DNS statistics"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "qbittorrent"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  },
+                                  "password": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url"
+                                ],
+                                "additionalProperties": false,
+                                "description": "qBittorrent download client"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "proxmox"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  },
+                                  "password": {
+                                    "type": "string"
+                                  },
+                                  "node": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "username",
+                                  "password"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Proxmox VE cluster status"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "portainer"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "env": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "key",
+                                  "env"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Portainer container status"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "grafana"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  },
+                                  "password": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Grafana dashboard statistics"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "radarr"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "key": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "key"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Radarr movie management"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "nginx-proxy-manager"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  },
+                                  "password": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "username",
+                                  "password"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Nginx Proxy Manager proxy hosts"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "cloudflared"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "accountId": {
+                                    "type": "string"
+                                  },
+                                  "tunnelId": {
+                                    "type": "string"
+                                  },
+                                  "key": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "accountId",
+                                  "tunnelId",
+                                  "key"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Cloudflare Tunnel status"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "plex"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "token": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "token"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Plex media server statistics"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "sonarr"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "key": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "key"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Sonarr TV show management"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ],
+                        "description": "Widget configuration"
+                      },
+                      "statuscheck": {
+                        "anyOf": [
+                          {
+                            "type": "boolean",
+                            "const": true,
+                            "description": "Simple mode: use service URL for health check"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "Custom health check URL"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "default": 60000,
+                                "description": "Check interval in milliseconds"
+                              },
+                              "timeout": {
+                                "type": "number",
+                                "default": 5000,
+                                "description": "Request timeout in milliseconds"
+                              },
+                              "method": {
+                                "type": "string",
+                                "enum": [
+                                  "GET",
+                                  "HEAD"
+                                ],
+                                "default": "HEAD",
+                                "description": "HTTP method"
+                              },
+                              "expectedStatus": {
+                                "type": "number",
+                                "default": 200,
+                                "description": "Expected HTTP status code"
+                              }
+                            },
+                            "additionalProperties": false,
+                            "description": "Advanced status check configuration"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Service or bookmark item"
+                  },
+                  "description": "Items in this group"
+                }
+              },
+              "required": [
+                "name",
+                "items"
+              ],
+              "additionalProperties": false,
+              "description": "Nested group within a service group"
+            },
+            "description": "Nested groups (use this OR items, not both)"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "Service group containing items or nested groups"
+      },
+      "description": "Array of service groups"
+    }
+  }
+}

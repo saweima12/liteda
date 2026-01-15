@@ -1,0 +1,361 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Liteda settings schema",
+  "description": "Liteda settings.yaml configuration",
+  "$ref": "#/definitions/settings",
+  "definitions": {
+    "settings": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "default": "Homepage",
+          "description": "Site title"
+        },
+        "theme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "auto"
+          ],
+          "default": "dark",
+          "description": "Color theme"
+        },
+        "background": {
+          "type": "object",
+          "properties": {
+            "image": {
+              "type": "string",
+              "description": "Background image URL"
+            },
+            "color": {
+              "type": "string",
+              "description": "Background color (CSS)"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.5,
+              "description": "Background opacity (0-1)"
+            },
+            "blur": {
+              "type": "number",
+              "default": 0,
+              "description": "Background blur in pixels"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Background configuration"
+        },
+        "favicon": {
+          "type": "string",
+          "description": "Favicon URL"
+        },
+        "customCss": {
+          "type": "string",
+          "description": "Custom CSS styles"
+        },
+        "layout": {
+          "type": "object",
+          "properties": {
+            "columns": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 3,
+              "description": "Number of columns (1-6)"
+            },
+            "style": {
+              "type": "string",
+              "enum": [
+                "grid",
+                "masonry"
+              ],
+              "default": "grid",
+              "description": "Layout style"
+            },
+            "header": {
+              "type": "array",
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "theme-switcher"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Toggle between light and dark theme"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "title"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Display site title from settings"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "resources"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {
+                          "backend": {
+                            "type": "string",
+                            "enum": [
+                              "local",
+                              "glances"
+                            ],
+                            "default": "local"
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "version": {
+                            "type": "number",
+                            "default": 4
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          },
+                          "cpu": {
+                            "type": "boolean",
+                            "default": true
+                          },
+                          "memory": {
+                            "type": "boolean",
+                            "default": true
+                          },
+                          "disk": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            ]
+                          },
+                          "cputemp": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "refresh": {
+                            "type": "number",
+                            "default": 5000
+                          },
+                          "showGraph": {
+                            "type": "boolean",
+                            "default": true
+                          },
+                          "tempUnit": {
+                            "type": "string",
+                            "enum": [
+                              "celsius",
+                              "fahrenheit"
+                            ],
+                            "default": "celsius"
+                          },
+                          "tempWarn": {
+                            "type": "number",
+                            "default": 80
+                          }
+                        },
+                        "additionalProperties": false,
+                        "description": "System resources monitor (CPU, Memory, Disk, Temperature)"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "spacer"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Flexible space between items"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "search"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Global search"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "weather"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {
+                          "latitude": {
+                            "type": "number",
+                            "minimum": -90,
+                            "maximum": 90
+                          },
+                          "longitude": {
+                            "type": "number",
+                            "minimum": -180,
+                            "maximum": 180
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "units": {
+                            "type": "string",
+                            "enum": [
+                              "metric",
+                              "imperial"
+                            ],
+                            "default": "metric"
+                          },
+                          "refresh": {
+                            "type": "number",
+                            "default": 600000
+                          },
+                          "cache": {
+                            "type": "number",
+                            "default": 5
+                          }
+                        },
+                        "required": [
+                          "latitude",
+                          "longitude"
+                        ],
+                        "additionalProperties": false,
+                        "description": "Current weather from Open-Meteo API"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  }
+                ],
+                "description": "Header addon configuration"
+              },
+              "description": "Header addons"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Layout configuration"
+        },
+        "i18n": {
+          "type": "object",
+          "properties": {
+            "locale": {
+              "type": "string",
+              "enum": [
+                "en",
+                "zh"
+              ],
+              "default": "en",
+              "description": "Interface language"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Internationalization settings"
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique page identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Page display name"
+              },
+              "icon": {
+                "type": "string",
+                "description": "Page icon"
+              },
+              "file": {
+                "type": "string",
+                "description": "YAML or Markdown file path relative to config/"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "file"
+            ],
+            "additionalProperties": false,
+            "description": "Page configuration"
+          },
+          "description": "Additional pages"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Global settings configuration"
+    }
+  }
+}
