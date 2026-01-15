@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=../schemas/services.schema.json
+
 # Media Services Page
 - name: Streaming
   items:

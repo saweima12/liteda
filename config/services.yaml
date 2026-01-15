@@ -1,5 +1,6 @@
-# Home Page Services
+# yaml-language-server: $schema=./schemas/services.schema.json
 
+# Home Page Services
 # Example: Nested groups with columns (groups arranged in grid)
 - name: Infrastructure
   icon: openldap
