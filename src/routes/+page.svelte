@@ -31,8 +31,7 @@
   });
 
   // Default header if not configured
-  const defaultHeader = [
-    { type: 'title' },
+  const defaultRightHeader = [
     { type: 'spacer' },
     { type: 'theme-switcher' },
   ];
@@ -98,7 +97,7 @@
 <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
   <!-- Header -->
   <header class="mb-6">
-    <Bar items={headerItems ?? defaultHeader} />
+    <Bar items={headerItems ?? defaultRightHeader} />
   </header>
 
   <!-- Page Tabs -->

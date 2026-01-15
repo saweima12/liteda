@@ -16,15 +16,7 @@ layout:
   style: grid
   # Header addons (optional - default: title, spacer, theme-switcher)
   header:
-    - type: title
-    - type: spacer
-    - type: weather
-      vars:
-        latitude: 25.0330
-        longitude: 121.5654
-        label: "Taipei"
-        units: metric
-        refresh: 600000
+    # Left side
     - type: resources
       vars:
         cpu: true
@@ -32,6 +24,16 @@ layout:
         disk: /
         cputemp: true
         refresh: 5000
+    # Spacer pushes items to right
+    - type: spacer
+    # Right side
+    - type: weather
+      vars:
+        latitude: 25.0330
+        longitude: 121.5654
+        label: "Taipei"
+        units: metric
+        refresh: 600000
     - type: search
     - type: theme-switcher
 
