@@ -51,3 +51,11 @@ export {
 	DialogTrigger,
 	DialogClose,
 } from './dialog';
+
+// Popover
+export {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+	PopoverClose,
+} from './popover';
