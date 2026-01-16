@@ -1,9 +1,10 @@
 import type { ServerInit } from '@sveltejs/kit';
-import { loadSettings, loadAllPages, extractWidgets, extractAddons, setCachedConfig, type Page } from '$config';
+import { loadSettings, loadAllPages, extractWidgets, extractGadgets, setCachedConfig, type Page } from '$config';
 import { updateWidgetConfigs } from '$lib/widgets';
-import { updateAddonConfigs } from '$lib/addons/config-store';
+import { updateGadgetConfigs } from '$lib/gadgets/config-store';
 import { updateStatusCheckConfigs } from '$lib/status-check';
 import { initI18n } from '$lib/i18n';
+import { loadFeatures } from '$lib/features';
 
 export const init: ServerInit = async () => {
     const settings = await loadSettings();
@@ -17,11 +18,16 @@ export const init: ServerInit = async () => {
         { id: 'home', name: 'Home', icon: 'home', file: 'services.yaml' }
     ];
 
+    // Load features (can modify pagesContent by injecting services)
+    if (settings.features) {
+        await loadFeatures(settings.features, pagesContent);
+    }
+
     const { widgets, statusChecks, serviceWidgetIds, statusCheckIds } = extractWidgets(pagesContent, pagesList);
-    const { addons, addonIds } = extractAddons(settings);
+    const { gadgets, gadgetIds } = extractGadgets(settings);
 
     updateWidgetConfigs(widgets);
-    updateAddonConfigs(addons);
+    updateGadgetConfigs(gadgets);
     updateStatusCheckConfigs(statusChecks);
 
     setCachedConfig({
@@ -30,6 +36,6 @@ export const init: ServerInit = async () => {
         pagesList,
         widgetIds: serviceWidgetIds,
         statusIds: statusCheckIds,
-        addonIds,
+        gadgetIds,
     });
 };

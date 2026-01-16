@@ -162,7 +162,7 @@ export function getConfigDir(): string {
 }
 
 import type { StatusCheckFullConfig } from '$lib/status-check';
-import type { AddonConfig } from './schema';
+import type { GadgetConfig } from './schema';
 
 /** Widget ID mapping: widgetId -> full config (including vars) */
 export interface WidgetRegistry {
@@ -175,11 +175,11 @@ export interface WidgetRegistry {
   statusChecks: Map<string, StatusCheckFullConfig>;
 }
 
-/** Addon ID mapping: addonId -> full config (including vars) */
-export interface AddonRegistry {
-  addons: Map<string, AddonConfig>;
-  /** Maps addon index in header to addon ID */
-  addonIds: string[];
+/** Gadget ID mapping: gadgetId -> full config (including vars) */
+export interface GadgetRegistry {
+  gadgets: Map<string, GadgetConfig>;
+  /** Maps gadget index in header to gadget ID */
+  gadgetIds: string[];
 }
 
 /**
@@ -280,21 +280,21 @@ export function extractWidgets(
 }
 
 /**
- * Extract addons from settings header and generate IDs
- * Returns addon registry with unique IDs for each addon instance
+ * Extract gadgets from settings header and generate IDs
+ * Returns gadget registry with unique IDs for each gadget instance
  */
-export function extractAddons(settings: Settings): AddonRegistry {
-  const addons = new Map<string, AddonConfig>();
-  const addonIds: string[] = [];
-  let addonCounter = 0;
+export function extractGadgets(settings: Settings): GadgetRegistry {
+  const gadgets = new Map<string, GadgetConfig>();
+  const gadgetIds: string[] = [];
+  let gadgetCounter = 0;
 
-  const headerAddons = settings.layout?.header || [];
+  const headerGadgets = settings.layout?.header || [];
 
-  for (const addon of headerAddons) {
-    const addonId = `addon-${++addonCounter}`;
-    addons.set(addonId, addon);
-    addonIds.push(addonId);
+  for (const gadget of headerGadgets) {
+    const gadgetId = `gadget-${++gadgetCounter}`;
+    gadgets.set(gadgetId, gadget);
+    gadgetIds.push(gadgetId);
   }
 
-  return { addons, addonIds };
+  return { gadgets, gadgetIds };
 }

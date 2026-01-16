@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import { getCachedConfig, type PageContent } from '$config';
 
 export const load: PageServerLoad = async () => {
-  const { settings, pagesContent, pagesList, widgetIds, statusIds, addonIds } = getCachedConfig();
+  const { settings, pagesContent, pagesList, widgetIds, statusIds, gadgetIds } = getCachedConfig();
 
   const pages: Record<string, PageContent> = Object.fromEntries(pagesContent);
   const widgetIdsObj: Record<string, string> = Object.fromEntries(widgetIds);
@@ -14,6 +14,6 @@ export const load: PageServerLoad = async () => {
     pagesList,
     widgetIds: widgetIdsObj,
     statusIds: statusIdsObj,
-    addonIds,
+    gadgetIds,
   };
 };

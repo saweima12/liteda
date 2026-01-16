@@ -74,10 +74,16 @@ export const pageSchema = z.object({
   file: z.string(), // yaml file path relative to config/
 });
 
-// Addon config schema (for Bar items)
-export const addonConfigSchema = z.object({
+// Gadget config schema (for Bar items)
+export const gadgetConfigSchema = z.object({
   type: z.string(),
-}).passthrough(); // Allow additional properties for addon-specific config
+}).passthrough(); // Allow additional properties for gadget-specific config
+
+// Feature config schema
+export const featureConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  vars: z.record(z.unknown()).optional(),
+});
 
 // Settings schema
 export const settingsSchema = z.object({
@@ -94,12 +100,13 @@ export const settingsSchema = z.object({
   layout: z.object({
     columns: z.number().min(1).max(6).optional().default(3),
     style: z.enum(['grid', 'masonry']).optional().default('grid'),
-    header: z.array(addonConfigSchema).optional(),
+    header: z.array(gadgetConfigSchema).optional(),
   }).optional(),
   i18n: z.object({
     locale: z.enum(locales as [string, ...string[]]).optional().default('en'),
   }).optional(),
   pages: z.array(pageSchema).optional(),
+  features: z.record(featureConfigSchema).optional(),
 });
 
 
@@ -127,7 +134,7 @@ export const configSchema = z.object({
 });
 
 // Type exports
-export type AddonConfig = z.infer<typeof addonConfigSchema>;
+export type GadgetConfig = z.infer<typeof gadgetConfigSchema>;
 export type WidgetConfig = z.infer<typeof widgetConfigSchema>;
 export type StatusCheckConfig = z.infer<typeof statusCheckConfigSchema>;
 export type ServiceItem = z.infer<typeof serviceItemSchema>;

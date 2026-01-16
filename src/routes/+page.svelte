@@ -14,7 +14,7 @@
   const pages = $derived(data.pages);
   const widgetIds = $derived(data.widgetIds);
   const statusIds = $derived(data.statusIds);
-  const addonIds = $derived(data.addonIds ?? []);
+  const gadgetIds = $derived(data.gadgetIds ?? []);
   const defaultColumns = $derived(settings.layout?.columns ?? 3);
   const headerItems = $derived(settings.layout?.header);
 
@@ -98,7 +98,7 @@
 <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
   <!-- Header -->
   <header class="mb-6">
-    <Bar items={headerItems ?? defaultRightHeader} ids={addonIds} />
+    <Bar items={headerItems ?? defaultRightHeader} ids={gadgetIds} />
   </header>
 
   <!-- Page Tabs -->
