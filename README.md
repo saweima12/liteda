@@ -51,6 +51,50 @@ config/
 bun run schema
 ```
 
+## Project Structure
+
+### Core Components
+
+```
+src/lib/
+├── widgets/           # Service monitoring widgets (always loaded)
+├── gadgets/           # Header bar components (always loaded)
+├── features/          # Heavy optional functionality (lazy loaded)
+├── i18n/translations/ # Translation files
+├── config/            # Config loader and schemas
+└── components/        # UI components
+```
+
+**Widgets** - Service monitoring cards:
+- Location: `src/lib/widgets/`
+- Auto-discovered via Vite glob
+- Always bundled and loaded (eager import)
+- Lightweight (~10-30 KB each)
+- Examples: Portainer, Jellyfin, Proxmox, qBittorrent
+- See: [Widget System](#widgets)
+
+**Gadgets** - Header bar components:
+- Location: `src/lib/gadgets/`
+- Auto-discovered via Vite glob
+- Always bundled and loaded (eager import)
+- Lightweight (~10-30 KB each, ~80 KB total)
+- Examples: Weather, resources, search, theme-switcher
+- See: [Addons](#addons)
+
+**Features** - Heavy optional functionality:
+- Location: `src/lib/features/`
+- Manually registered in `loader.ts`
+- Lazy loaded only when enabled in config
+- Heavy dependencies allowed (~1-5 MB)
+- Can inject services, modify config
+- Future examples: Docker discovery, Kubernetes integration
+
+**Translations** - i18n language files:
+- Location: `src/lib/i18n/translations/`
+- JSON files for each locale (e.g., `en.json`, `zh-TW.json`)
+- Auto-loaded based on `settings.yaml` locale setting
+- Keys organized by component/feature
+
 ### settings.yaml
 
 ```yaml
@@ -64,7 +108,7 @@ background:
 
 layout:
   columns: 3
-  # Customizable header with addons
+  # Customizable header with gadgets
   header:
     - type: title
     - type: spacer
@@ -249,21 +293,21 @@ export const POST = createHandler({
 
 > 📁 See all widgets in [`src/lib/widgets/`](src/lib/widgets/) directory
 
-## Addons
+## Gadgets
 
-Addons are components for the header bar. Like widgets, they use auto-discovery.
+Gadgets are lightweight components for the header bar. Like widgets, they use auto-discovery and are always loaded.
 
 ### Structure
 
 ```
-src/lib/addons/my-addon/
-├── meta.ts      # Addon definition
+src/lib/gadgets/my-gadget/
+├── meta.ts      # Gadget definition
 └── Addon.svelte # UI component
 ```
 
-### Built-in Addons
+### Built-in Gadgets
 
-**6 addons available** for header customization:
+**6 gadgets available** for header customization:
 
 - `title` - Display site title
 - `spacer` - Flexible space (pushes items to the right)
@@ -272,11 +316,11 @@ src/lib/addons/my-addon/
 - `resources` - System resources monitor (CPU, memory, disk, temp)
 - `weather` - Current weather display with detailed popover
 
-> 📁 See all addons in [`src/lib/addons/`](src/lib/addons/) directory
+> 📁 See all gadgets in [`src/lib/gadgets/`](src/lib/gadgets/) directory
 
 ### Header Configuration
 
-Customize your header bar with various addons:
+Customize your header bar with various gadgets:
 
 ```yaml
 layout:
@@ -337,9 +381,9 @@ docker compose up -d
 4. Build UI in `Widget.svelte`
 5. Use in config with `widget.type: my-widget`
 
-### Adding a New Addon
+### Adding a New Gadget
 
-1. Create folder in `src/lib/addons/`
-2. Add `meta.ts` with `defineAddon()`
+1. Create folder in `src/lib/gadgets/`
+2. Add `meta.ts` with `defineGadget()`
 3. Create `Addon.svelte` component
 4. Use in `settings.yaml` header config

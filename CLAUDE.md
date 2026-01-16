@@ -72,21 +72,21 @@ src/lib/widgets/my-widget/
 
 **Important:** Widget `vars` (API keys, secrets) are NEVER sent to the client. The server fetches using the full config stored in `src/lib/widgets/config-store.ts`.
 
-### Addon System
+### Gadget System
 
-Addons are header bar components that use auto-discovery similar to widgets:
+Gadgets are lightweight header bar components that use auto-discovery similar to widgets:
 
 ```
-src/lib/addons/my-addon/
-├── meta.ts      # Addon definition with defineAddon()
+src/lib/gadgets/my-gadget/
+├── meta.ts      # Gadget definition with defineGadget()
 ├── types.ts     # TypeScript types + Zod schemas (optional)
 ├── utils.ts     # Helper functions (optional)
 └── Addon.svelte # UI component
 ```
 
-Auto-scanned via `src/lib/addons/registry.ts`. Configured in `settings.yaml` under `layout.header`.
+Auto-scanned via `src/lib/gadgets/registry.ts`. Configured in `settings.yaml` under `layout.header`.
 
-**Built-in Addons:**
+**Built-in Gadgets:**
 - `title` - Display site title from settings
 - `spacer` - Flexible spacer (use `flex-1` to push items to the right)
 - `theme-switcher` - Toggle between light/dark theme
@@ -94,7 +94,7 @@ Auto-scanned via `src/lib/addons/registry.ts`. Configured in `settings.yaml` und
 - `resources` - System resources monitor (CPU, memory, disk, temperature)
 - `weather` - Current weather from Open-Meteo API with clickable popover for details
 
-**Weather Addon Example:**
+**Weather Gadget Example:**
 ```yaml
 layout:
   header:
@@ -112,14 +112,108 @@ layout:
     - type: theme-switcher
 ```
 
-**Addon Patterns:**
-- Addons with API calls use the unified handler pattern (similar to widgets)
-- API route: GET `/api/addons/[type]?id=<addon-id>` - only addon ID is passed from client
+**Gadget Patterns:**
+- Gadgets with API calls use the unified handler pattern (similar to widgets)
+- API route: GET `/api/gadgets/[type]?id=<gadget-id>` - only gadget ID is passed from client
 - **Security Model:** Sensitive vars (API keys, passwords) are NEVER sent to client - server looks up full config by ID
 - Client-side polling using `$effect` with cleanup
 - Use `browser` check before fetching data
 - Support configurable refresh intervals via `vars`
-- Server-side handlers use `createAddonHandler()` utility with Zod validation and caching
+- Server-side handlers use `createGadgetHandler()` utility with Zod validation and caching
+
+**Key Characteristics:**
+- **Always loaded** - Eager import via `import.meta.glob({ eager: true })`
+- **Lightweight** - ~10-30 KB per gadget, ~80 KB total
+- **Synchronous access** - No async complexity, errors caught at startup
+- **Similar to widgets** - Both are auto-discovered and always bundled
+
+### Features System
+
+Features are heavy optional functionality that can be enabled via config. Unlike gadgets/widgets which are always bundled, features are lazy-loaded only when enabled.
+
+```
+src/lib/features/my-feature/
+├── index.ts     # Feature implementation (default export)
+├── meta.ts      # Feature metadata and Zod schemas
+├── types.ts     # TypeScript types (optional)
+└── README.md    # Feature documentation
+```
+
+**Feature Interface:**
+```typescript
+export interface Feature {
+  name: string;
+  version: string;
+
+  // Initialize the feature - called at server startup if enabled
+  init(vars: unknown, pagesContent: Map<string, PageContent>): Promise<void>;
+
+  // Optional cleanup on server shutdown
+  destroy?(): Promise<void>;
+}
+```
+
+**Example Feature:**
+```typescript
+// src/lib/features/my-feature/index.ts
+import type { Feature } from '../types';
+import { myFeatureVarsSchema } from './meta';
+
+const myFeature: Feature = {
+  name: 'my-feature',
+  version: '1.0.0',
+
+  async init(vars, pagesContent) {
+    const config = myFeatureVarsSchema.parse(vars);
+
+    // Feature logic here - can inject services into pages
+    const homePage = pagesContent.get('home');
+    if (homePage) {
+      homePage.services.push({
+        name: 'My Feature Services',
+        items: [/* ... */],
+      });
+    }
+  },
+};
+
+export default myFeature;
+```
+
+**Configuration:**
+```yaml
+# config/settings.yaml
+features:
+  my-feature:
+    enabled: true
+    vars:
+      apiKey: "your-api-key"
+      endpoint: "https://api.example.com"
+```
+
+**Feature Registration:**
+Add to `src/lib/features/loader.ts`:
+```typescript
+const FEATURES_REGISTRY: Record<string, () => Promise<{ default: Feature }>> = {
+  'my-feature': () => import('./my-feature'),
+};
+```
+
+**Key Characteristics:**
+- **Lazy loaded** - Only imported when enabled in config
+- **Heavy** - Can have large dependencies (e.g., dockerode ~1-2 MB)
+- **Server startup** - Loaded during `hooks.server.ts` init
+- **Can modify config** - Features run before widget extraction, can inject services
+- **Manual registration** - Explicitly registered in loader (not auto-discovered)
+
+**Gadgets vs Features Comparison:**
+| Aspect | Gadgets/Widgets | Features |
+|--------|----------------|----------|
+| Loading | Eager (always) | Lazy (when enabled) |
+| Size | ~10-30 KB | ~1-5 MB |
+| Registration | Auto-discovered | Manual |
+| Use case | UI components | Heavy functionality |
+| Examples | Weather, resources | Docker discovery, K8s |
 
 ### Server-Side Rendering & Caching
 
@@ -232,29 +326,29 @@ docker compose up -d
 4. Build UI in `Widget.svelte` using `useWidget()` composable
 5. No registration needed - auto-discovered on next build
 
-**Adding a New Addon:**
-1. Create folder: `src/lib/addons/my-addon/`
-2. Define with `defineAddon()` in `meta.ts`
-3. (Optional) Create `types.ts` if addon needs Zod schemas
+**Adding a New Gadget:**
+1. Create folder: `src/lib/gadgets/my-gadget/`
+2. Define with `defineGadget()` in `meta.ts`
+3. (Optional) Create `types.ts` if gadget needs Zod schemas
 4. (Optional) Create `utils.ts` for helper functions
-5. (Optional) Create API route if addon needs server-side data fetching
+5. (Optional) Create API route if gadget needs server-side data fetching
 6. Create UI in `Addon.svelte`
 7. Configure in `settings.yaml` under `layout.header`
 
-**Addon with API Example (Weather):**
+**Gadget with API Example (Weather):**
 ```
-src/lib/addons/weather/
+src/lib/gadgets/weather/
 ├── types.ts           # Zod schemas, constants, TypeScript types
 ├── utils.ts           # Helper functions (formatting, mapping)
-├── handler.ts         # GET handler with createAddonHandler()
+├── handler.ts         # GET handler with createGadgetHandler()
 ├── Addon.svelte       # UI component with client-side polling
-└── meta.ts            # Addon registration
+└── meta.ts            # Gadget registration
 ```
 
-**Creating an Addon Handler:**
+**Creating a Gadget Handler:**
 ```typescript
-// src/lib/addons/my-addon/handler.ts
-import { createAddonHandler } from '$lib/addons/utils/create-handler';
+// src/lib/gadgets/my-gadget/handler.ts
+import { createGadgetHandler } from '$lib/gadgets/utils/create-handler';
 import { z } from 'zod';
 
 const varsSchema = z.object({
@@ -263,7 +357,7 @@ const varsSchema = z.object({
   cache: z.number().default(5), // minutes
 });
 
-export const GET = createAddonHandler({
+export const GET = createGadgetHandler({
   varsSchema,
   async fetch(vars) {
     // Sensitive vars (apiKey) are ONLY available server-side
@@ -273,23 +367,35 @@ export const GET = createAddonHandler({
     return res.json();
   },
   cacheTtl: (vars) => vars.cache * 60 * 1000,
-  getCacheKey: (vars) => `my-addon:${vars.endpoint}`,
+  getCacheKey: (vars) => `my-gadget:${vars.endpoint}`,
 });
 ```
 
-**Calling Addon API from Svelte:**
+**Calling Gadget API from Svelte:**
 ```typescript
 // Addon.svelte
-interface Props extends AddonProps<MyAddonConfig> {}
+interface Props extends GadgetProps<MyGadgetConfig> {}
 let { config, id }: Props = $props();
 
 async function fetchData() {
-  // SECURITY: Only pass addon ID - server looks up vars with apiKey
-  const res = await fetch(`/api/addons/my-addon?id=${encodeURIComponent(id)}`);
+  // SECURITY: Only pass gadget ID - server looks up vars with apiKey
+  const res = await fetch(`/api/gadgets/my-gadget?id=${encodeURIComponent(id)}`);
   if (!res.ok) throw new Error('Failed to fetch');
   return res.json();
 }
 ```
+
+**Adding a New Feature:**
+1. Create folder: `src/lib/features/my-feature/`
+2. Create `meta.ts` with Zod schemas for feature vars
+3. Create `index.ts` implementing the `Feature` interface
+4. (Optional) Create `types.ts` for TypeScript types
+5. (Optional) Create `README.md` documenting the feature
+6. Register in `src/lib/features/loader.ts` FEATURES_REGISTRY
+7. Enable in `settings.yaml` under `features`
+
+**Feature Template:**
+See `src/lib/features/_template/README.md` for a complete example.
 
 **Modifying Config Schema:**
 - Update `src/lib/config/schema.ts` with Zod schemas
@@ -305,11 +411,11 @@ curl -X POST http://localhost:5173/api/widgets/demo \
   -d '{"id":"widget-1"}'
 ```
 
-**Addon Handlers** expect GET requests with query parameter `id`:
+**Gadget Handlers** expect GET requests with query parameter `id`:
 ```bash
-# Test an addon endpoint
-curl "http://localhost:5173/api/addons/weather?id=addon-1"
+# Test a gadget endpoint
+curl "http://localhost:5173/api/gadgets/weather?id=gadget-1"
 
-# Test resources addon
-curl "http://localhost:5173/api/addons/resources?id=addon-1"
+# Test resources gadget
+curl "http://localhost:5173/api/gadgets/resources?id=gadget-1"
 ```
