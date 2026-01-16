@@ -4,6 +4,8 @@ import type { ZodType } from 'zod';
 /** Props passed to addon components */
 export interface AddonProps<TConfig = Record<string, unknown>> {
   config: TConfig;
+  /** Unique addon instance ID (for API calls) */
+  id: string;
 }
 
 /** Addon configuration from YAML */

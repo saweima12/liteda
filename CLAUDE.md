@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Liteda is a lightweight homelab dashboard built with SvelteKit. It provides a configurable interface for managing services, widgets, and markdown content. The app is designed to be memory-efficient (~50-80MB) with a focus on SSR proxy capabilities to avoid CORS issues.
+Liteda is a lightweight homelab dashboard built with SvelteKit. It provides a configurable interface for managing services, widgets, and markdown content. The app is designed to be memory-efficient (~50-100MB) with a focus on SSR proxy capabilities to avoid CORS issues.
+
+**Memory Usage Notes:**
+- Baseline memory: ~50-80MB
+- Memory can fluctuate to ~100MB during active polling due to HTTP connection pools and V8/Bun GC behavior
+- Cache system has LRU eviction (max 1000 entries) to prevent unbounded growth
+- Memory stays within acceptable bounds during long-running sessions
 
 ## Commands
 
@@ -107,17 +113,32 @@ layout:
 ```
 
 **Addon Patterns:**
-- Addons with API calls should use dedicated API routes (e.g., `/api/weather`, `/api/resources`)
+- Addons with API calls use the unified handler pattern (similar to widgets)
+- API route: GET `/api/addons/[type]?id=<addon-id>` - only addon ID is passed from client
+- **Security Model:** Sensitive vars (API keys, passwords) are NEVER sent to client - server looks up full config by ID
 - Client-side polling using `$effect` with cleanup
 - Use `browser` check before fetching data
 - Support configurable refresh intervals via `vars`
+- Server-side handlers use `createAddonHandler()` utility with Zod validation and caching
 
 ### Server-Side Rendering & Caching
 
 - **SSR Proxy:** Widget handlers run server-side to avoid CORS issues
 - **Config Cache:** Config is loaded once at startup (`hooks.server.ts`) and cached in memory
-- **Widget Data Cache:** `src/lib/widgets/utils/cache.ts` provides TTL-based caching with thundering herd prevention
+- **Widget Data Cache:** `src/lib/widgets/utils/cache.ts` provides production-grade caching:
+  - **LRU Eviction:** Max 1000 entries, automatically evicts least recently used items
+  - **Lazy Expiration:** Expired entries cleaned on access for optimal performance
+  - **Opportunistic Cleanup:** Gradually removes stale data (5 items per access)
+  - **Periodic Purge:** Background task cleans all expired entries every 5 minutes
+  - **Thundering Herd Prevention:** Concurrent requests share the same fetch promise
+  - **Memory Safety:** Bounded cache size prevents unbounded memory growth
 - **Status Checks:** Similar polling system for service availability in `src/lib/status-check/`
+
+**Cache Configuration:**
+- Default TTL: 5 seconds (or widget's `interval` setting)
+- Max cache size: 1000 entries
+- Purge interval: 5 minutes
+- All API endpoints (widgets, weather, status checks) use the unified cache system
 
 ### Path Aliases
 
@@ -225,23 +246,70 @@ docker compose up -d
 src/lib/addons/weather/
 ├── types.ts           # Zod schemas, constants, TypeScript types
 ├── utils.ts           # Helper functions (formatting, mapping)
+├── handler.ts         # GET handler with createAddonHandler()
 ├── Addon.svelte       # UI component with client-side polling
 └── meta.ts            # Addon registration
+```
 
-src/routes/api/weather/
-└── +server.ts         # GET handler with caching
+**Creating an Addon Handler:**
+```typescript
+// src/lib/addons/my-addon/handler.ts
+import { createAddonHandler } from '$lib/addons/utils/create-handler';
+import { z } from 'zod';
+
+const varsSchema = z.object({
+  apiKey: z.string(),
+  endpoint: z.string(),
+  cache: z.number().default(5), // minutes
+});
+
+export const GET = createAddonHandler({
+  varsSchema,
+  async fetch(vars) {
+    // Sensitive vars (apiKey) are ONLY available server-side
+    const res = await fetch(vars.endpoint, {
+      headers: { 'Authorization': `Bearer ${vars.apiKey}` }
+    });
+    return res.json();
+  },
+  cacheTtl: (vars) => vars.cache * 60 * 1000,
+  getCacheKey: (vars) => `my-addon:${vars.endpoint}`,
+});
+```
+
+**Calling Addon API from Svelte:**
+```typescript
+// Addon.svelte
+interface Props extends AddonProps<MyAddonConfig> {}
+let { config, id }: Props = $props();
+
+async function fetchData() {
+  // SECURITY: Only pass addon ID - server looks up vars with apiKey
+  const res = await fetch(`/api/addons/my-addon?id=${encodeURIComponent(id)}`);
+  if (!res.ok) throw new Error('Failed to fetch');
+  return res.json();
+}
 ```
 
 **Modifying Config Schema:**
 - Update `src/lib/config/schema.ts` with Zod schemas
 - Restart dev server to reload config
 
-## Testing Widget Handlers
+## Testing Handlers
 
-Widget handlers expect POST requests with JSON body containing `id`:
+**Widget Handlers** expect POST requests with JSON body containing `id`:
 ```bash
 # Test a widget endpoint
 curl -X POST http://localhost:5173/api/widgets/demo \
   -H "Content-Type: application/json" \
   -d '{"id":"widget-1"}'
+```
+
+**Addon Handlers** expect GET requests with query parameter `id`:
+```bash
+# Test an addon endpoint
+curl "http://localhost:5173/api/addons/weather?id=addon-1"
+
+# Test resources addon
+curl "http://localhost:5173/api/addons/resources?id=addon-1"
 ```

@@ -162,6 +162,7 @@ export function getConfigDir(): string {
 }
 
 import type { StatusCheckFullConfig } from '$lib/status-check';
+import type { AddonConfig } from './schema';
 
 /** Widget ID mapping: widgetId -> full config (including vars) */
 export interface WidgetRegistry {
@@ -172,6 +173,13 @@ export interface WidgetRegistry {
   statusCheckIds: Map<string, string>;
   /** Status check configs */
   statusChecks: Map<string, StatusCheckFullConfig>;
+}
+
+/** Addon ID mapping: addonId -> full config (including vars) */
+export interface AddonRegistry {
+  addons: Map<string, AddonConfig>;
+  /** Maps addon index in header to addon ID */
+  addonIds: string[];
 }
 
 /**
@@ -269,4 +277,24 @@ export function extractWidgets(
   }
 
   return { widgets, serviceWidgetIds, statusCheckIds, statusChecks };
+}
+
+/**
+ * Extract addons from settings header and generate IDs
+ * Returns addon registry with unique IDs for each addon instance
+ */
+export function extractAddons(settings: Settings): AddonRegistry {
+  const addons = new Map<string, AddonConfig>();
+  const addonIds: string[] = [];
+  let addonCounter = 0;
+
+  const headerAddons = settings.layout?.header || [];
+
+  for (const addon of headerAddons) {
+    const addonId = `addon-${++addonCounter}`;
+    addons.set(addonId, addon);
+    addonIds.push(addonId);
+  }
+
+  return { addons, addonIds };
 }

@@ -9,7 +9,7 @@
 
 	interface Props extends AddonProps<ResourcesConfig> {}
 
-	let { config }: Props = $props();
+	let { config, id }: Props = $props();
 
 	// Extract vars with defaults
 	const vars = $derived<Partial<ResourcesVars>>(config.vars ?? {});
@@ -27,27 +27,14 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
+	/**
+	 * Fetch resources data from our API
+	 * Only pass addon ID - server will lookup vars from config
+	 */
 	async function fetchResources() {
 		try {
-			const params = new URLSearchParams();
+			const res = await fetch(`/api/addons/resources?id=${encodeURIComponent(id)}`);
 
-			// Backend selection
-			const backend = vars.backend ?? 'local';
-			params.set('backend', backend);
-
-			// Disk path
-			const diskParam = typeof vars.disk === 'string' ? vars.disk : '/';
-			params.set('disk', diskParam);
-
-			// Glances-specific params
-			if (backend === 'glances') {
-				if (vars.url) params.set('url', vars.url);
-				if (vars.version) params.set('version', String(vars.version));
-				if (vars.username) params.set('username', vars.username);
-				if (vars.password) params.set('password', vars.password);
-			}
-
-			const res = await fetch(`/api/resources?${params.toString()}`);
 			if (!res.ok) throw new Error('Failed to fetch resources');
 			data = await res.json();
 			error = null;

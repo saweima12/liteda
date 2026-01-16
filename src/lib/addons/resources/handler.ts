@@ -1,47 +1,11 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { createAddonHandler } from '$lib/addons/utils/create-handler';
+import { resourcesVarsSchema, type ResourcesData } from './types';
 import si from 'systeminformation';
-
-export interface ResourcesData {
-	cpu: {
-		usage: number;
-		load: number;
-	} | null;
-	memory: {
-		used: number;
-		total: number;
-		free: number;
-		usedPercent: number;
-	} | null;
-	disk: {
-		used: number;
-		total: number;
-		free: number;
-		usedPercent: number;
-		mount: string;
-	} | null;
-	temperature: {
-		main: number | null;
-		max: number | null;
-	} | null;
-}
-
-// Cache for reducing system calls
-const cacheMap = new Map<string, { data: ResourcesData; timestamp: number }>();
-const CACHE_TTL = 2000; // 2 seconds
 
 /**
  * Get resources from local system using systeminformation
  */
 async function getLocalResources(diskPath?: string): Promise<ResourcesData> {
-	const cacheKey = `local:${diskPath || '/'}`;
-	const now = Date.now();
-	const cached = cacheMap.get(cacheKey);
-
-	if (cached && now - cached.timestamp < CACHE_TTL) {
-		return cached.data;
-	}
-
 	// Fetch all data in parallel
 	const [cpuLoad, currentLoad, mem, fsSize, temp] = await Promise.all([
 		si.currentLoad(),
@@ -55,7 +19,7 @@ async function getLocalResources(diskPath?: string): Promise<ResourcesData> {
 	const targetMount = diskPath || '/';
 	const targetDisk = fsSize.find((fs) => fs.mount === targetMount) || fsSize[0];
 
-	const data: ResourcesData = {
+	return {
 		cpu: {
 			usage: Math.round(currentLoad.currentLoad),
 			load: Math.round(cpuLoad.avgLoad * 100) / 100,
@@ -80,9 +44,6 @@ async function getLocalResources(diskPath?: string): Promise<ResourcesData> {
 			max: temp.max !== null ? Math.round(temp.max * 10) / 10 : null,
 		},
 	};
-
-	cacheMap.set(cacheKey, { data, timestamp: now });
-	return data;
 }
 
 /**
@@ -133,18 +94,10 @@ interface GlancesSensor {
 async function getGlancesResources(
 	url: string,
 	version: number,
-	diskPath?: string,
+	diskPath?: string | string[],
 	username?: string,
 	password?: string
 ): Promise<ResourcesData> {
-	const cacheKey = `glances:${url}:${diskPath || '/'}`;
-	const now = Date.now();
-	const cached = cacheMap.get(cacheKey);
-
-	if (cached && now - cached.timestamp < CACHE_TTL) {
-		return cached.data;
-	}
-
 	const baseUrl = url.replace(/\/$/, '');
 	const apiVersion = version || 4;
 	const apiBase = `${baseUrl}/api/${apiVersion}`;
@@ -197,7 +150,8 @@ async function getGlancesResources(
 	let disk: ResourcesData['disk'] = null;
 	if (fsRes.status === 'fulfilled' && fsRes.value.ok) {
 		const fsData: GlancesFs[] = await fsRes.value.json();
-		const targetMount = diskPath || '/';
+		const targetPath = typeof diskPath === 'string' ? diskPath : (Array.isArray(diskPath) ? diskPath[0] : '/');
+		const targetMount = targetPath || '/';
 		const targetFs = fsData.find((fs) => fs.mnt_point === targetMount) || fsData[0];
 		if (targetFs) {
 			disk = {
@@ -229,37 +183,42 @@ async function getGlancesResources(
 		}
 	}
 
-	const data: ResourcesData = { cpu, memory, disk, temperature };
-	cacheMap.set(cacheKey, { data, timestamp: now });
-	return data;
+	return { cpu, memory, disk, temperature };
 }
 
-export const GET: RequestHandler = async ({ url }) => {
-	try {
-		const backend = url.searchParams.get('backend') || 'local';
-		const diskPath = url.searchParams.get('disk') || '/';
-
-		if (backend === 'glances') {
-			const glancesUrl = url.searchParams.get('url');
-			if (!glancesUrl) {
-				return json({ error: 'Glances URL is required' }, { status: 400 });
+/**
+ * GET /api/addons/resources?id=<addon-id>
+ * Query parameter:
+ *   - id: string (addon instance ID)
+ *
+ * Server-side vars (from settings.yaml):
+ *   - backend: 'local' | 'glances' (default: 'local')
+ *   - disk: string | string[] (mount point, optional)
+ *   - url: string (required for glances backend)
+ *   - version: number (glances API version, default: 4)
+ *   - username: string (optional, for glances auth)
+ *   - password: string (optional, for glances auth)
+ */
+export const GET = createAddonHandler({
+	varsSchema: resourcesVarsSchema,
+	async fetch(vars) {
+		if (vars.backend === 'glances') {
+			if (!vars.url) {
+				throw new Error('Glances URL is required');
 			}
-			const version = parseInt(url.searchParams.get('version') || '4', 10);
-			const username = url.searchParams.get('username') || undefined;
-			const password = url.searchParams.get('password') || undefined;
-
-			const data = await getGlancesResources(glancesUrl, version, diskPath, username, password);
-			return json(data);
+			return getGlancesResources(
+				vars.url,
+				vars.version ?? 4,
+				vars.disk,
+				vars.username,
+				vars.password
+			);
 		}
 
 		// Default: local
-		const data = await getLocalResources(diskPath);
-		return json(data);
-	} catch (error) {
-		console.error('Failed to get system resources:', error);
-		return json(
-			{ error: 'Failed to get system resources' },
-			{ status: 500 }
-		);
-	}
-};
+		const diskPath = typeof vars.disk === 'string' ? vars.disk : (Array.isArray(vars.disk) ? vars.disk[0] : undefined);
+		return getLocalResources(diskPath);
+	},
+	cacheTtl: 2000, // 2 seconds
+	getCacheKey: (vars) => `resources:${vars.backend}:${vars.disk || '/'}:${vars.url || ''}`,
+});

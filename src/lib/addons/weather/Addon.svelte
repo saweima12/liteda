@@ -23,7 +23,7 @@
 
 	interface Props extends AddonProps<WeatherConfig> {}
 
-	let { config }: Props = $props();
+	let { config, id }: Props = $props();
 
 	// Extract vars with defaults
 	const vars = $derived(config.vars);
@@ -42,21 +42,12 @@
 
 	/**
 	 * Fetch weather data from our API
+	 * Only pass addon ID - server will lookup vars from config
 	 */
 	async function fetchWeather() {
 		try {
-			const params = new URLSearchParams({
-				latitude: latitude.toString(),
-				longitude: longitude.toString(),
-				cache: cache.toString(),
-			});
-			
-			if (label) {
-				params.set('label', label);
-			}
+			const response = await fetch(`/api/addons/weather?id=${encodeURIComponent(id)}`);
 
-			const response = await fetch(`/api/weather?${params.toString()}`);
-			
 			if (!response.ok) {
 				const errorData = await response.json().catch(() => ({}));
 				throw new Error(errorData.error || 'Failed to fetch weather');

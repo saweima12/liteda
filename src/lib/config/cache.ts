@@ -6,6 +6,7 @@ let cachedPagesContent: Map<string, PageContent>;
 let cachedPagesList: Page[];
 let cachedWidgetIds: Map<string, string>;
 let cachedStatusIds: Map<string, string>;
+let cachedAddonIds: string[];
 
 export function setCachedConfig(config: {
     settings: Settings;
@@ -13,12 +14,14 @@ export function setCachedConfig(config: {
     pagesList: Page[];
     widgetIds: Map<string, string>;
     statusIds: Map<string, string>;
+    addonIds: string[];
 }) {
     cachedSettings = config.settings;
     cachedPagesContent = config.pagesContent;
     cachedPagesList = config.pagesList;
     cachedWidgetIds = config.widgetIds;
     cachedStatusIds = config.statusIds;
+    cachedAddonIds = config.addonIds;
 }
 
 export function getCachedConfig() {
@@ -28,5 +31,6 @@ export function getCachedConfig() {
         pagesList: cachedPagesList,
         widgetIds: cachedWidgetIds,
         statusIds: cachedStatusIds,
+        addonIds: cachedAddonIds,
     };
 }

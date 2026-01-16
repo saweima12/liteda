@@ -5,17 +5,19 @@
 
   interface Props {
     items: AddonConfig[];
+    ids: string[];
     class?: string;
   }
 
-  let { items, class: className = '' }: Props = $props();
+  let { items, ids, class: className = '' }: Props = $props();
 </script>
 
 <div class="flex items-center gap-4 {className}">
-  {#each items as item (item.type)}
+  {#each items as item, index (ids[index])}
     {@const AddonComponent = getAddonComponent(item.type)}
+    {@const addonId = ids[index]}
     {#if AddonComponent}
-      <AddonComponent config={item} />
+      <AddonComponent config={item} id={addonId} />
     {:else}
       <div class="flex items-center gap-1 text-sm text-destructive">
         <IconAlertCircle class="h-4 w-4" />
