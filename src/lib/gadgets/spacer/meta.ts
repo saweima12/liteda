@@ -1,8 +1,8 @@
 import { defineGadget } from '../define';
-import Addon from './Addon.svelte';
+import Gadget from './Gadget.svelte';
 
 export default defineGadget({
   name: 'spacer',
-  component: Addon,
+  component: Gadget,
   description: 'Flexible space between items',
 });

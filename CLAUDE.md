@@ -81,7 +81,7 @@ src/lib/gadgets/my-gadget/
 ├── meta.ts      # Gadget definition with defineGadget()
 ├── types.ts     # TypeScript types + Zod schemas (optional)
 ├── utils.ts     # Helper functions (optional)
-└── Addon.svelte # UI component
+└── Gadget.svelte # UI component
 ```
 
 Auto-scanned via `src/lib/gadgets/registry.ts`. Configured in `settings.yaml` under `layout.header`.
@@ -332,7 +332,7 @@ docker compose up -d
 3. (Optional) Create `types.ts` if gadget needs Zod schemas
 4. (Optional) Create `utils.ts` for helper functions
 5. (Optional) Create API route if gadget needs server-side data fetching
-6. Create UI in `Addon.svelte`
+6. Create UI in `Gadget.svelte`
 7. Configure in `settings.yaml` under `layout.header`
 
 **Gadget with API Example (Weather):**
@@ -341,7 +341,7 @@ src/lib/gadgets/weather/
 ├── types.ts           # Zod schemas, constants, TypeScript types
 ├── utils.ts           # Helper functions (formatting, mapping)
 ├── handler.ts         # GET handler with createGadgetHandler()
-├── Addon.svelte       # UI component with client-side polling
+├── Gadget.svelte       # UI component with client-side polling
 └── meta.ts            # Gadget registration
 ```
 
@@ -373,7 +373,7 @@ export const GET = createGadgetHandler({
 
 **Calling Gadget API from Svelte:**
 ```typescript
-// Addon.svelte
+// Gadget.svelte
 interface Props extends GadgetProps<MyGadgetConfig> {}
 let { config, id }: Props = $props();
 

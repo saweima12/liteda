@@ -68,5 +68,5 @@ export default {
       },
     },
   },
-  plugins: [typography],
+  plugins: [typography, require('@tailwindcss/container-queries')],
 };

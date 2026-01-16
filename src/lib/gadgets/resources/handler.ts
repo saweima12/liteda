@@ -19,16 +19,21 @@ async function getLocalResources(diskPath?: string): Promise<ResourcesData> {
 	const targetMount = diskPath || '/';
 	const targetDisk = fsSize.find((fs) => fs.mount === targetMount) || fsSize[0];
 
+	// Calculate actual used memory (works across Linux/macOS/Windows)
+	// On macOS: mem.used includes cache, so we use total - available
+	// On Linux: both approaches should give similar results
+	const memoryUsed = mem.total - mem.available;
+
 	return {
 		cpu: {
 			usage: Math.round(currentLoad.currentLoad),
 			load: Math.round(cpuLoad.avgLoad * 100) / 100,
 		},
 		memory: {
-			used: mem.active,
+			used: memoryUsed,
 			total: mem.total,
 			free: mem.available,
-			usedPercent: Math.round((mem.active / mem.total) * 100),
+			usedPercent: Math.round((memoryUsed / mem.total) * 100),
 		},
 		disk: targetDisk
 			? {
@@ -142,7 +147,7 @@ async function getGlancesResources(
 			used: memData.used,
 			total: memData.total,
 			free: memData.available,
-			usedPercent: Math.round(memData.percent),
+			usedPercent: Math.round((memData.used / memData.total) * 100),
 		};
 	}
 

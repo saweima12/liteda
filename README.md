@@ -47,6 +47,7 @@ config/
 ```
 
 **IDE Support**: Config files include JSON schema validation for autocompletion and error checking. Generate schemas with:
+
 ```bash
 bun run schema
 ```
@@ -66,6 +67,7 @@ src/lib/
 ```
 
 **Widgets** - Service monitoring cards:
+
 - Location: `src/lib/widgets/`
 - Auto-discovered via Vite glob
 - Always bundled and loaded (eager import)
@@ -74,6 +76,7 @@ src/lib/
 - See: [Widget System](#widgets)
 
 **Gadgets** - Header bar components:
+
 - Location: `src/lib/gadgets/`
 - Auto-discovered via Vite glob
 - Always bundled and loaded (eager import)
@@ -82,14 +85,16 @@ src/lib/
 - See: [Addons](#addons)
 
 **Features** - Heavy optional functionality:
+
 - Location: `src/lib/features/`
 - Manually registered in `loader.ts`
 - Lazy loaded only when enabled in config
 - Heavy dependencies allowed (~1-5 MB)
 - Can inject services, modify config
-- Future examples: Docker discovery, Kubernetes integration
+- Future examples: Docker discovery
 
 **Translations** - i18n language files:
+
 - Location: `src/lib/i18n/translations/`
 - JSON files for each locale (e.g., `en.json`, `zh-TW.json`)
 - Auto-loaded based on `settings.yaml` locale setting
@@ -212,6 +217,7 @@ src/lib/widgets/my-widget/
 ### Creating a Widget
 
 **meta.ts**
+
 ```typescript
 import { z } from 'zod';
 import { defineWidget } from '../utils/define';
@@ -235,6 +241,7 @@ export default defineWidget({
 ```
 
 **handler.ts**
+
 ```typescript
 import { createHandler } from '../utils/create-handler';
 import widget from './meta';
@@ -253,6 +260,7 @@ export const POST = createHandler({
 ```
 
 **Widget.svelte**
+
 ```svelte
 <script lang="ts">
   import type { WidgetProps } from '../types';
@@ -302,7 +310,7 @@ Gadgets are lightweight components for the header bar. Like widgets, they use au
 ```
 src/lib/gadgets/my-gadget/
 ├── meta.ts      # Gadget definition
-└── Addon.svelte # UI component
+└── Gadget.svelte # UI component
 ```
 
 ### Built-in Gadgets
@@ -385,5 +393,5 @@ docker compose up -d
 
 1. Create folder in `src/lib/gadgets/`
 2. Add `meta.ts` with `defineGadget()`
-3. Create `Addon.svelte` component
+3. Create `Gadget.svelte` component
 4. Use in `settings.yaml` header config

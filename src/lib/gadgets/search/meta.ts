@@ -1,9 +1,9 @@
 import { defineGadget } from '../define';
-import Addon from './Addon.svelte';
+import Gadget from './Gadget.svelte';
 
 export default defineGadget({
 	name: 'search',
-	component: Addon,
+	component: Gadget,
 	description: 'Global search',
 	icon: 'search',
 });

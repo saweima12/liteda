@@ -1,9 +1,9 @@
 import { defineGadget } from '../define';
-import Addon from './Addon.svelte';
+import Gadget from './Gadget.svelte';
 
 export default defineGadget({
   name: 'theme-switcher',
-  component: Addon,
+  component: Gadget,
   description: 'Toggle between light and dark theme',
   icon: 'sun',
 });

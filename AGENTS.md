@@ -124,7 +124,7 @@ bun run check           # Run svelte-check
 
 ### File Organization
 - Widgets: `src/lib/widgets/[name]/` with `meta.ts`, `handler.ts`, `Widget.svelte`
-- Addons: `src/lib/addons/[name]/` with `meta.ts`, `Addon.svelte` (optionally `types.ts`, `utils.ts`)
+- Addons: `src/lib/addons/[name]/` with `meta.ts`, `Gadget.svelte` (optionally `types.ts`, `utils.ts`)
   - Addons with API calls: Add API route in `src/routes/api/[name]/+server.ts`
   - Example: weather addon has `types.ts`, `utils.ts`, and `/api/weather` route
 - Config: `src/lib/config/` with loader, schema, cache
@@ -161,7 +161,7 @@ bun run check           # Run svelte-check
 **Creating an addon:**
 1. Create folder: `src/lib/addons/my-addon/`
 2. Define `meta.ts` with `defineAddon()`
-3. Create `Addon.svelte` with UI
+3. Create `Gadget.svelte` with UI
 4. (Optional) Add `types.ts` for Zod schemas if needed
 5. (Optional) Add `utils.ts` for helper functions
 6. (Optional) Add API route in `src/routes/api/my-addon/+server.ts` if addon needs server-side data
@@ -184,7 +184,7 @@ export const GET: RequestHandler = async ({ url }) => {
   // Parse params, check cache, fetch data, return JSON
 };
 
-// src/lib/addons/weather/Addon.svelte
+// src/lib/addons/weather/Gadget.svelte
 $effect(() => {
   if (!browser) return;
   fetchWeather();

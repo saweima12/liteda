@@ -4,30 +4,30 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-opacity: 0.8;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 225 4.8% 85.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 72.2% 50.6%;
+    --background: 220 17% 97%;
+    --foreground: 222 47% 11%;
+    --card: 220 17% 98%;
+    --card-opacity: 0.85;
+    --card-foreground: 222 47% 11%;
+    --popover: 220 17% 98%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 237 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 262 52% 96%;
+    --secondary-foreground: 262 83% 35%;
+    --muted: 220 17% 90%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 199 95% 95%;
+    --accent-foreground: 199 89% 38%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --border: 220 17% 88%;
+    --input: 220 17% 88%;
+    --ring: 237 83% 58%;
     --radius: 0.5rem;
   }
 
@@ -71,8 +71,11 @@
 
   .bg-card {
     background-color: hsl(var(--card) / var(--card-opacity)) !important;
-    backdrop-filter: blur(8px);
-    border-color: hsl(var(--border) / var(--card-opacity));
+    backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow:
+      0 0 0 1px hsl(var(--primary) / 0.05) inset,
+      0 4px 12px hsl(var(--foreground) / 0.05);
   }
 
 }
@@ -80,9 +83,10 @@
 /* Background pattern - only shows when no background image */
 .bg-pattern {
   background-color: hsl(var(--background));
-  background-image: 
-    radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.05) 0%, transparent 50%);
+  background-image:
+    radial-gradient(ellipse at 10% 20%, hsl(237 83% 65% / 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 80%, hsl(262 83% 65% / 0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, hsl(199 89% 55% / 0.04) 0%, transparent 60%);
 }
 
 /* When background image is present, make pattern transparent */

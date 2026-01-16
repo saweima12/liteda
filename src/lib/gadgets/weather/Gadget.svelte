@@ -103,19 +103,19 @@
 
 <Popover.Root bind:open={popoverOpen}>
 	<Popover.Trigger
-		class="inline-flex items-center gap-2 text-sm hover:text-foreground transition-colors"
+		class="inline-flex items-center gap-1 sm:gap-2 text-xs sm:text-sm hover:text-foreground transition-colors"
 	>
 			{#if loading && !data}
-				<IconLoader class="h-4 w-4 animate-spin text-muted-foreground" />
-				<span class="text-muted-foreground">Loading...</span>
+				<IconLoader class="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin text-muted-foreground flex-shrink-0" />
+				<span class="text-muted-foreground hidden sm:inline">Loading...</span>
 			{:else if error}
-				<IconAlertCircle class="h-4 w-4 text-destructive" />
-				<span class="text-destructive">Weather unavailable</span>
+				<IconAlertCircle class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-destructive flex-shrink-0" />
+				<span class="text-destructive hidden sm:inline">Error</span>
 			{:else if data}
-				<WeatherIcon class="h-4 w-4" />
+				<WeatherIcon class="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
 				<span class="font-medium">{formatTemp(data.temperature, units)}</span>
 				{#if label}
-					<span class="text-muted-foreground">{label}</span>
+					<span class="text-muted-foreground hidden md:inline">{label}</span>
 				{/if}
 			{/if}
 	</Popover.Trigger>
