@@ -16,28 +16,36 @@ background:
 layout:
   columns: 3
   style: grid
-  # Header addons (optional - default: title, spacer, theme-switcher)
+  # Header gadgets with group support
   header:
-    # Left side
-    - type: resources
+    # Left group (center-aligned, items distributed)
+    - type: group
       vars:
-        cpu: true
-        memory: true
-        disk: /
-        cputemp: true
-        refresh: 5000
+        align: center # left, center, right
+        items:
+          - type: resources
+            vars:
+              cpu: true
+              memory: true
+              disk: /
+              cputemp: true
+              refresh: 10000
     # Spacer pushes items to right
     - type: spacer
-    # Right side
-    - type: weather
+    # Right group (right-aligned)
+    - type: group
       vars:
-        latitude: 25.0330
-        longitude: 121.5654
-        label: "Taipei"
-        units: metric
-        refresh: 600000
-    - type: search
-    - type: theme-switcher
+        align: center # left, center, right
+        items:
+          - type: weather
+            vars:
+              latitude: 25.0330
+              longitude: 121.5654
+              label: "Taipei"
+              units: metric
+              refresh: 600000
+          - type: search
+          - type: theme-switcher
 
 # Pages (optional - if not set, services.yaml is used as single page)
 pages:
