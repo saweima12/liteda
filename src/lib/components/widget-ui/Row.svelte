@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
+
   interface Props {
     label: string;
     value: string | number;
-    icon?: any;
+    icon?: Component;
     hint?: string;
   }
 

@@ -82,7 +82,8 @@
 	 * Map icon name to component
 	 */
 	function getIconComponent(name: string) {
-		const iconMap: Record<string, any> = {
+		type IconComponent = typeof IconSun;
+		const iconMap: Record<string, IconComponent> = {
 			'sun': IconSun,
 			'moon': IconMoon,
 			'cloud': IconCloud,
