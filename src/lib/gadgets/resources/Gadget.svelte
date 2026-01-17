@@ -83,7 +83,7 @@
 
 {#if data}
 	<!-- Always use flex layout with wrap, centered, distributed spacing -->
-	<div class="flex flex-wrap items-center justify-center w-full gap-4 sm:gap-6 md:gap-8 text-sm">
+	<div class="flex flex-wrap items-center justify-center w-full gap-4 md:gap-3 text-sm">
 		<!-- CPU -->
 		{#if showCpu && data.cpu}
 			<GadgetItem icon={IconCpu} iconClass="text-muted-foreground">
