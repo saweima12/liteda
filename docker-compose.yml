@@ -1,17 +1,50 @@
 services:
   liteda:
+    # For local development: use build
     build: .
+    
+    # For production: use pre-built image
+    # image: ghcr.io/your-username/liteda:latest
+    
+    # For local development with hot reload: use separate docker-compose.dev.yml
+    # See: docker-compose.dev.yml (optional)
+    
     container_name: liteda
     restart: unless-stopped
+    
     ports:
+      # Map host port to container port 3000
       - "3000:3000"
+    
     volumes:
-      # Config files
-      - ./config:/app/config:ro
-      # Docker socket for container widget
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Config directory (will be auto-initialized on first run)
+      - ./config:/app/config
+      
+      # Optional: Enable Docker widget (requires docker socket access)
+      # WARNING: Mounting docker socket has security implications
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    
     environment:
-      - NODE_ENV=production
+      # Port (fixed at 3000 inside container, change host mapping above)
+      - PORT=3000
+      
+      # Config directory
       - CONFIG_DIR=/app/config
-    # Optional: run as specific user
-    # user: "1000:1000"
+      
+      # Auto-reload on config changes (default: false, set true to enable)
+      - AUTO_RELOAD=false
+      
+      # Node environment
+      - NODE_ENV=production
+    
+    # Optional: Override user if you encounter permission issues
+    # Uncomment and restart if you can't edit config files
+    # user: "${UID:-1000}:${GID:-1000}"
+    
+    # Health check (uses /health endpoint)
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3

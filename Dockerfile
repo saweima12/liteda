@@ -1,50 +1,66 @@
 # Build stage
-FROM node:22-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
-
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy package files
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json bun.lockb* ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN bun install --frozen-lockfile
 
-# Copy source
+# For local development with live reload, you can use:
+# docker run -v ./src:/app/src -v ./config:/app/config liteda bun dev
+
+# Copy source code
 COPY . .
 
-# Build
-RUN pnpm build
+# Build application
+RUN bun run build
 
 # Production stage
-FROM node:22-alpine AS runner
+FROM oven/bun:1-alpine AS runner
 
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 liteda
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 
-# Copy built files
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./
+# Create non-root user with UID 1000 (most common)
+RUN addgroup -g 1000 liteda && \
+    adduser -D -u 1000 -G liteda liteda
 
-# Set permissions
-RUN chown -R liteda:nodejs /app
+# Copy built files from builder
+COPY --from=builder --chown=liteda:liteda /app/build ./build
+COPY --from=builder --chown=liteda:liteda /app/package.json ./
 
+# Copy example config
+COPY --chown=liteda:liteda config.example /app/config-example
+
+# Copy entrypoint script
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/
+
+# Create config directory (will be mounted)
+RUN mkdir -p /app/config && chown liteda:liteda /app/config
+
+# Switch to non-root user
 USER liteda
 
-# Environment
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV CONFIG_DIR=/app/config
+# Environment variables
+ENV NODE_ENV=production \
+    PORT=3000 \
+    CONFIG_DIR=/app/config \
+    AUTO_RELOAD=false
 
+# Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+# Health check using dedicated endpoint
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-CMD ["node", "build/index.js"]
+# Use entrypoint for initialization
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Start application
+CMD ["bun", "run", "build/index.js"]

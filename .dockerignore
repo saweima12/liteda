@@ -1,0 +1,48 @@
+# Dependencies
+node_modules
+.pnpm-store
+.bun
+
+# Build output
+build
+.svelte-kit
+dist
+
+# Development
+.vscode
+.idea
+*.log
+logs
+
+# Git
+.git
+.gitignore
+.github
+
+# Environment
+.env
+.env.*
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Tests
+tests
+test
+*.test.ts
+*.spec.ts
+
+# User config (will be mounted as volume)
+config/*
+!config/.gitkeep
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore

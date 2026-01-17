@@ -1,0 +1,39 @@
+# Docker Compose for Local Development
+# Usage: docker compose -f docker-compose.dev.yml up
+
+services:
+  liteda:
+    build:
+      context: .
+      target: builder  # Use builder stage only
+    
+    container_name: liteda-dev
+    
+    ports:
+      - "5173:5173"  # Vite dev server port
+    
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src
+      - ./static:/app/static
+      - ./config:/app/config
+      
+      # Mount config files
+      - ./svelte.config.js:/app/svelte.config.js
+      - ./vite.config.ts:/app/vite.config.ts
+      - ./tailwind.config.js:/app/tailwind.config.js
+      - ./tsconfig.json:/app/tsconfig.json
+      
+      # Optional: Docker socket for testing Docker widgets
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    
+    environment:
+      - NODE_ENV=development
+      - AUTO_RELOAD=true
+      - CONFIG_DIR=/app/config
+    
+    # Override command to run dev server
+    command: bun run dev --host 0.0.0.0
+    
+    # No restart policy for dev
+    restart: "no"
