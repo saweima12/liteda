@@ -123,12 +123,16 @@ export const settingsSchema = z.object({
 // Page file schema (array of groups)
 export const servicesFileSchema = z.array(serviceGroupSchema);
 
-// Block definition for markdown pages (single level only)
+// Block definition for markdown pages (supports nested groups)
 export const blockDefinitionSchema = z.object({
   name: z.string(),
   type: z.enum(['services', 'bookmarks']).optional().default('services'),
+  icon: z.string().optional(),
   columns: z.number().min(1).max(6).optional(),
-  items: z.array(serviceItemSchema),
+  items: z.array(serviceItemSchema).optional(),
+  groups: z.array(innerGroupSchema).optional(),
+  equalHeight: z.boolean().optional(),
+  showName: z.boolean().optional(),
 });
 
 // Page content schema

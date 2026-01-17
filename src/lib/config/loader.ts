@@ -272,8 +272,20 @@ export function extractWidgets(
     // Process blocks
     if (content.blocks) {
       for (const [blockId, block] of Object.entries(content.blocks)) {
-        for (const item of block.items) {
-          processItem(item, `${page.id}:block:${blockId}`);
+        // Blocks can have either items (flat) or groups (nested)
+        if (block.items) {
+          for (const item of block.items) {
+            processItem(item, `${page.id}:block:${blockId}`);
+          }
+        }
+        if (block.groups) {
+          for (const innerGroup of block.groups) {
+            if (innerGroup.items) {
+              for (const item of innerGroup.items) {
+                processItem(item, `${page.id}:block:${blockId}:${innerGroup.name}`);
+              }
+            }
+          }
         }
       }
     }
