@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { ServiceGroup as ServiceGroupType, InnerGroup } from '$config';
   import ServiceCard from './ServiceCard.svelte';
+  import CompactCard from './CompactCard.svelte';
   import IconExternalLink from '~icons/lucide/external-link';
+  import { getGroupRenderer, hasCustomRenderer } from '$lib/features/group-registry';
 
   interface Props {
     group: ServiceGroupType;
@@ -13,10 +15,17 @@
 
   let { group, defaultColumns = 3, pageId = '', widgetIds = {}, statusIds = {} }: Props = $props();
 
+  const hasCustom = $derived(hasCustomRenderer(group.type));
+  const CustomRenderer = $derived(hasCustom ? getGroupRenderer(group.type) : null);
+
+  // Unique identifier for this group instance (useful for custom renderers)
+  const groupId = $derived(`${pageId}:${group.name}`);
+
   // Check if this is a nested group (has groups) or flat group (has items)
   const isNested = $derived(group.groups && group.groups.length > 0);
   const columns = $derived(group.columns ?? defaultColumns);
   const isBookmarks = $derived(group.type === 'bookmarks');
+  const isCompact = $derived(group.type === 'compact');
   const equalHeight = $derived(group.equalHeight ?? true);
   const showName = $derived(group.showName ?? true);
 
@@ -40,6 +49,10 @@
     return inner.type === 'bookmarks';
   }
 
+  function isInnerCompact(inner: InnerGroup): boolean {
+    return inner.type === 'compact';
+  }
+
   function getWidgetId(groupName: string, itemName: string, innerGroupName?: string): string | undefined {
     const key = innerGroupName 
       ? `${pageId}:${groupName}:${innerGroupName}:${itemName}`
@@ -55,7 +68,9 @@
   }
 </script>
 
-{#if isNested}
+{#if CustomRenderer}
+  <CustomRenderer config={(group as unknown as { vars?: Record<string, unknown> }).vars || {}} {groupId} />
+{:else if isNested}
   <!-- Nested group: outer group is a section header -->
   <section class="space-y-6">
     {#if showName}
@@ -79,6 +94,7 @@
       {#each group.groups as innerGroup (innerGroup.name)}
         {@const innerCols = innerGroup.columns ?? defaultColumns}
         {@const innerIsBookmarks = isInnerBookmarks(innerGroup)}
+        {@const innerIsCompact = isInnerCompact(innerGroup)}
         {@const innerEqualHeight = innerGroup.equalHeight ?? true}
         {@const innerShowName = innerGroup.showName ?? true}
         
@@ -119,6 +135,12 @@
                   {item.name}
                   <IconExternalLink class="h-3 w-3 opacity-50" />
                 </a>
+              {/each}
+            </div>
+          {:else if innerIsCompact}
+            <div class="grid gap-3 {gridCols[innerCols] || gridCols[1]}">
+              {#each innerGroup.items as item (item.name)}
+                <CompactCard {item} />
               {/each}
             </div>
           {:else}
@@ -171,6 +193,12 @@
             {item.name}
             <IconExternalLink class="h-3 w-3 opacity-50" />
           </a>
+        {/each}
+      </div>
+    {:else if isCompact}
+      <div class="grid gap-3 {gridCols[columns] || gridCols[3]}">
+        {#each group.items ?? [] as item (item.name)}
+          <CompactCard {item} />
         {/each}
       </div>
     {:else}

@@ -18,10 +18,18 @@
             "description": "Group icon"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "services",
-              "bookmarks"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "services",
+                  "bookmarks",
+                  "compact"
+                ]
+              },
+              {
+                "type": "string"
+              }
             ],
             "default": "services",
             "description": "Display type"
@@ -41,6 +49,11 @@
             "type": "boolean",
             "default": true,
             "description": "Show group name"
+          },
+          "vars": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "Custom feature configuration"
           },
           "items": {
             "type": "array",
@@ -642,7 +655,8 @@
                   "type": "string",
                   "enum": [
                     "services",
-                    "bookmarks"
+                    "bookmarks",
+                    "compact"
                   ],
                   "default": "services",
                   "description": "Display type"

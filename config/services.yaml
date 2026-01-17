@@ -8,6 +8,7 @@
   groups:
     - name: Monitoring
       columns: 1
+      type: compact
       items:
         - name: Grafana
           icon: grafana
@@ -62,6 +63,7 @@
       description: Container registry
 
 - name: Tools
+  type: compact
   items:
     - name: Excalidraw
       icon: excalidraw

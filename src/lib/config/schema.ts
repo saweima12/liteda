@@ -38,7 +38,7 @@ export const serviceItemSchema = z.object({
 export const innerGroupSchema = z.object({
   name: z.string(),
   icon: z.string().optional(),
-  type: z.enum(['services', 'bookmarks']).optional().default('services'),
+  type: z.enum(['services', 'bookmarks', 'compact']).optional().default('services'),
   columns: z.number().min(1).max(6).optional(),
   equalHeight: z.boolean().optional().default(true),
   showName: z.boolean().optional().default(true),
@@ -46,25 +46,37 @@ export const innerGroupSchema = z.object({
 });
 
 // Service group schema (unified for services and bookmarks, supports nesting)
-export const serviceGroupSchema = z.object({
-  name: z.string(),
-  icon: z.string().optional(),
-  type: z.enum(['services', 'bookmarks']).optional().default('services'),
-  columns: z.number().min(1).max(6).optional(),
-  equalHeight: z.boolean().default(true).optional(),
-  showName: z.boolean().default(true).optional(),
-  // Either items OR groups, not both
-  items: z.array(serviceItemSchema).optional(),
-  groups: z.array(innerGroupSchema).optional(),
-}).refine(
-  (data) => {
-    // Must have either items or groups, but not both
-    const hasItems = data.items && data.items.length > 0;
-    const hasGroups = data.groups && data.groups.length > 0;
-    return (hasItems || hasGroups) && !(hasItems && hasGroups);
-  },
-  { message: "Group must have either 'items' or 'groups', not both" }
-);
+//
+// `type` keeps standard values for completion, but also allows custom feature types.
+// Custom types skip the default items/groups validation and can use `vars`.
+export const serviceGroupSchema = z
+  .object({
+    name: z.string(),
+    icon: z.string().optional(),
+    type: z
+      .union([z.enum(['services', 'bookmarks', 'compact']), z.string()])
+      .optional()
+      .default('services'),
+    columns: z.number().min(1).max(6).optional(),
+    equalHeight: z.boolean().default(true).optional(),
+    showName: z.boolean().default(true).optional(),
+    vars: z.record(z.unknown()).optional(),
+    // Either items OR groups, not both (standard groups only)
+    items: z.array(serviceItemSchema).optional(),
+    groups: z.array(innerGroupSchema).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type !== 'services' && data.type !== 'bookmarks' && data.type !== 'compact') {
+        return true;
+      }
+
+      const hasItems = data.items && data.items.length > 0;
+      const hasGroups = data.groups && data.groups.length > 0;
+      return (hasItems || hasGroups) && !(hasItems && hasGroups);
+    },
+    { message: "Group must have either 'items' or 'groups', not both" }
+  );
 
 // Page definition schema
 export const pageSchema = z.object({
@@ -123,17 +135,9 @@ export const settingsSchema = z.object({
 // Page file schema (array of groups)
 export const servicesFileSchema = z.array(serviceGroupSchema);
 
-// Block definition for markdown pages (supports nested groups)
-export const blockDefinitionSchema = z.object({
-  name: z.string(),
-  type: z.enum(['services', 'bookmarks']).optional().default('services'),
-  icon: z.string().optional(),
-  columns: z.number().min(1).max(6).optional(),
-  items: z.array(serviceItemSchema).optional(),
-  groups: z.array(innerGroupSchema).optional(),
-  equalHeight: z.boolean().optional(),
-  showName: z.boolean().optional(),
-});
+// Block definition for markdown pages
+// Same as serviceGroupSchema - blocks and service groups are identical
+export const blockDefinitionSchema = serviceGroupSchema;
 
 // Page content schema
 export const pageContentSchema = z.object({

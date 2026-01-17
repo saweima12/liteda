@@ -116,7 +116,10 @@ async function buildSchemas() {
 	const widgetConfigSchema =
 		widgetVarsSchemas.length > 0
 			? z
-					.discriminatedUnion('type', widgetVarsSchemas as [z.ZodObject<any>, ...z.ZodObject<any>[]])
+					.discriminatedUnion('type', widgetVarsSchemas as unknown as [
+						z.ZodObject<any>,
+						...z.ZodObject<any>[]
+					])
 					.describe('Widget configuration')
 			: z.object({ type: z.string() }).describe('Widget configuration');
 
@@ -144,7 +147,10 @@ async function buildSchemas() {
 	const gadgetConfigSchema =
 		allGadgetSchemas.length > 0
 			? z
-					.discriminatedUnion('type', allGadgetSchemas as [z.ZodObject<any>, ...z.ZodObject<any>[]])
+					.discriminatedUnion('type', allGadgetSchemas as unknown as [
+						z.ZodObject<any>,
+						...z.ZodObject<any>[]
+					])
 					.describe('Header gadget configuration')
 			: z.object({ type: z.string() }).describe('Header gadget configuration');
 
@@ -180,7 +186,7 @@ async function buildSchemas() {
 		.object({
 			name: z.string().describe('Group name'),
 			icon: z.string().optional().describe('Group icon'),
-			type: z.enum(['services', 'bookmarks']).default('services').describe('Display type'),
+			type: z.enum(['services', 'bookmarks', 'compact']).default('services').describe('Display type'),
 			columns: z.number().min(1).max(6).optional().describe('Number of columns (1-6)'),
 			equalHeight: z.boolean().default(true).describe('Equal height items'),
 			showName: z.boolean().default(true).describe('Show group name'),
@@ -193,10 +199,14 @@ async function buildSchemas() {
 		.object({
 			name: z.string().describe('Group name'),
 			icon: z.string().optional().describe('Group icon'),
-			type: z.enum(['services', 'bookmarks']).default('services').describe('Display type'),
+			type: z
+				.union([z.enum(['services', 'bookmarks', 'compact']), z.string()])
+				.default('services')
+				.describe('Display type'),
 			columns: z.number().min(1).max(6).optional().describe('Number of columns (1-6)'),
 			equalHeight: z.boolean().default(true).describe('Equal height items'),
 			showName: z.boolean().default(true).describe('Show group name'),
+			vars: z.record(z.unknown()).optional().describe('Custom feature configuration'),
 			items: z.array(serviceItemSchema).optional().describe('Items (use this OR groups, not both)'),
 			groups: z.array(innerGroupSchema).optional().describe('Nested groups (use this OR items, not both)'),
 		})
