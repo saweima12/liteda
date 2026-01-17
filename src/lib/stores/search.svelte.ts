@@ -62,16 +62,31 @@ export function buildSearchIndex(
 			}
 		}
 
-		// Process markdown blocks
-		if (content.blocks) {
-			for (const [, block] of Object.entries(content.blocks)) {
+	// Process markdown blocks
+	if (content.blocks) {
+		for (const [, block] of Object.entries(content.blocks)) {
+			// Blocks can have either items (flat) or groups (nested)
+			if (block.items) {
 				for (const item of block.items) {
 					if (item.url) {
 						result.push(createSearchItem(item, page, block.name));
 					}
 				}
 			}
+			// Process nested groups in blocks
+			if (block.groups) {
+				for (const innerGroup of block.groups) {
+					if (innerGroup.items) {
+						for (const item of innerGroup.items) {
+							if (item.url) {
+								result.push(createSearchItem(item, page, `${block.name} > ${innerGroup.name}`));
+							}
+						}
+					}
+				}
+			}
 		}
+	}
 	}
 
 	return result;

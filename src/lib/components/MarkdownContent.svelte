@@ -51,13 +51,22 @@
     return result;
   });
 
-  // Generate widgetIds scoped to block
-  function getBlockWidgetIds(blockId: string): Record<string, string> {
-    const prefix = `${pageId}:block:${blockId}:`;
+  // Generate widgetIds scoped to block, rewriting keys for ContentGroup
+  // ContentGroup expects: {pageId}:{groupName}:{itemName} or {pageId}:{groupName}:{innerGroupName}:{itemName}
+  // extractWidgets generates: {pageId}:block:{blockId}:{itemName} or {pageId}:block:{blockId}:{innerGroupName}:{itemName}
+  function getBlockWidgetIds(blockId: string, blockName: string): Record<string, string> {
+    const oldPrefix = `${pageId}:block:${blockId}:`;
+    const newPrefix = `${pageId}:block:${blockId}:${blockName}:`;
     const result: Record<string, string> = {};
+    
     for (const [key, value] of Object.entries(widgetIds)) {
-      if (key.startsWith(prefix)) {
-        result[key] = value;
+      if (key.startsWith(oldPrefix)) {
+        // Rewrite key: add blockName after blockId
+        // Old: "notes:block:tools:Portainer"
+        // New: "notes:block:tools:Infrastructure Services:Portainer"
+        const suffix = key.substring(oldPrefix.length);
+        const newKey = newPrefix + suffix;
+        result[newKey] = value;
       }
     }
     return result;
@@ -72,16 +81,21 @@
       </Card>
     {:else if part.type === 'block' && blocks[part.value]}
       {@const block = blocks[part.value]}
+      {@const blockPrefix = `${pageId}:block:${part.value}`}
       <ContentGroup 
         group={{ 
           name: block.name, 
           type: block.type,
+          icon: (block as any).icon,
           columns: block.columns,
-          items: block.items
+          items: block.items || [],
+          groups: (block as any).groups,
+          equalHeight: (block as any).equalHeight,
+          showName: (block as any).showName
         }} 
         {defaultColumns}
-        pageId="{pageId}:block:{part.value}"
-        widgetIds={getBlockWidgetIds(part.value)}
+        pageId={blockPrefix}
+        widgetIds={getBlockWidgetIds(part.value, block.name)}
       />
     {:else if part.type === 'block'}
       <Card class="p-4 border-warning/50 bg-warning/10">

@@ -1,7 +1,8 @@
 ---
 blocks:
+  # Block 1: Service cards with widget example
   tools:
-    name: Common Tools
+    name: Infrastructure Services
     type: services
     columns: 2
     items:
@@ -9,85 +10,215 @@ blocks:
         url: https://portainer.local
         icon: portainer
         description: Container management
+        # ⬇️ Uncomment to add live widget data
+        # widget:
+        #   type: portainer
+        #   interval: 10000
+        #   vars:
+        #     url: https://portainer.local
+        #     key: "your-api-key"
+        #     env: 1
+      
       - name: Grafana
         url: https://grafana.local
         icon: grafana
-        description: Metrics dashboard
-      - name: Prometheus
-        url: https://prometheus.local
-        icon: prometheus
-        description: Monitoring
-      - name: Traefik
-        url: https://traefik.local
-        icon: traefik
+        description: Metrics and monitoring
+      
+      - name: Proxmox
+        url: https://pve.local
+        icon: proxmox
+        description: Virtualization platform
+      
+      - name: Nginx Proxy Manager
+        url: https://npm.local
+        icon: nginx-proxy-manager
         description: Reverse proxy
 
-  bookmarks:
-    name: Development Resources
+  # Block 2: Nested groups example
+  monitoring:
+    name: Monitoring Stack
+    type: services
+    icon: activity
+    columns: 2
+    groups:
+      - name: Metrics
+        items:
+          - name: Prometheus
+            url: https://prometheus.local
+            icon: prometheus
+            description: Time-series database
+          - name: Grafana
+            url: https://grafana.local
+            icon: grafana
+            description: Visualization
+      
+      - name: Logs
+        items:
+          - name: Loki
+            url: https://loki.local
+            icon: grafana-loki
+            description: Log aggregation
+          - name: Uptime Kuma
+            url: https://uptime.local
+            icon: uptime-kuma
+            description: Status monitoring
+
+  # Block 3: Bookmarks example
+  links:
+    name: Quick Links
     type: bookmarks
     items:
       - name: GitHub
         url: https://github.com
         icon: github
-      - name: Stack Overflow
-        url: https://stackoverflow.com
-        icon: stackoverflow
-      - name: Reddit
-        url: https://reddit.com
+      - name: Docker Hub
+        url: https://hub.docker.com
+        icon: docker
+      - name: Proxmox Docs
+        url: https://pve.proxmox.com/wiki
+        icon: proxmox
+      - name: Reddit Homelab
+        url: https://reddit.com/r/homelab
         icon: reddit
 ---
 
-# Server Notes
+# Markdown Pages Guide
 
-This is a sample notes page demonstrating how to mix service links and Markdown content in Liteda.
+> **Liteda's Unique Feature**: Mix Markdown documentation with live service cards.
+> Define service blocks in the frontmatter, then inject them anywhere in your content.
+
+## 1. Service Cards
+
+Use the `:::block:name:::` syntax to inject service cards:
 
 ::: block:tools :::
 
-## Login Information
+**How it works:**
+- Services are defined in the frontmatter `blocks` section above
+- Use `::: block:tools :::` to inject them at any position
+- Cards are interactive and can include live widget data
 
-| Service | Username | Notes |
-|---------|----------|-------|
-| Proxmox | root | See password manager |
-| Portainer | admin | Default password changed |
+## 2. Nested Groups
 
-::: block:bookmarks :::
+You can organize services into nested groups:
 
-## Common Commands
+::: block:monitoring :::
 
-### Docker
+This example shows a two-level hierarchy: Monitoring Stack → Metrics/Logs.
 
-```bash
-# List running containers
-docker ps
+## 3. Bookmarks
 
-# List all containers (including stopped)
-docker ps -a
+Compact bookmark-style cards for quick links:
 
-# Enter a container
-docker exec -it <container_name> /bin/sh
+::: block:links :::
+
+Perfect for frequently accessed external resources.
+
+## 4. Tables
+
+Standard Markdown tables work great for documentation:
+
+| Service | Port | Protocol | Notes |
+|---------|------|----------|-------|
+| Portainer | 9000 | HTTPS | Container management |
+| Grafana | 3000 | HTTPS | Dashboards |
+| Proxmox | 8006 | HTTPS | Virtualization |
+| Nginx PM | 81 | HTTP | Proxy management |
+
+> **Security Tip**: Store credentials in a password manager, not in documentation!
+
+## 5. Task Lists
+
+Track maintenance tasks:
+
+- [ ] Daily: Check service status
+- [ ] Weekly: Review error logs
+- [ ] Weekly: Check disk space
+- [ ] Monthly: System updates
+- [ ] Monthly: Backup verification
+- [ ] Quarterly: Security audit
+- [ ] Yearly: Hardware review
+
+## 6. Callouts & Alerts
+
+Use blockquotes for important information:
+
+> **Important**: Always create VM snapshots before major updates!
+
+> **Tip**: Use `docker compose logs -f` to debug startup issues.
+
+> **Warning**: Mounting `/var/run/docker.sock` in containers has security implications.
+
+## 7. Adding Live Widgets
+
+To show live data on service cards, add a widget configuration in the frontmatter:
+
+```yaml
+- name: Portainer
+  url: https://portainer.local
+  icon: portainer
+  widget:
+    type: portainer        # Widget type
+    interval: 10000        # Refresh every 10 seconds
+    vars:                  # Server-side only (never sent to browser)
+      url: https://portainer.local
+      key: "your-api-key"
+      env: 1
 ```
 
-### Proxmox
+**Available widgets:**
+- Infrastructure: `portainer`, `proxmox`, `nginx-proxy-manager`, `cloudflared`
+- Monitoring: `grafana`, `uptime-kuma`, `adguard`
+- Media: `jellyfin`, `plex`, `sonarr`, `radarr`, `qbittorrent`, `tautulli`
 
-```bash
-# List all VMs
-qm list
+See [Widget Development](../../docs/WIDGETS.md) for creating custom widgets.
 
-# Start a VM
-qm start <vmid>
+## 9. Markdown Features
 
-# Check VM status
-qm status <vmid>
+### Headers
+
+Use `#` for headers (h1 through h6).
+
+### Lists
+
+**Unordered:**
+- Item one
+- Item two
+  - Nested item
+  - Another nested
+
+**Ordered:**
+1. First step
+2. Second step
+3. Third step
+
+### Emphasis
+
+*Italic text* or _italic text_
+
+**Bold text** or __bold text__
+
+***Bold and italic*** or ___bold and italic___
+
+### Links
+
+[Internal link](/) - Link to home page
+
+[External link](https://github.com) - Link to external site
+
+[Documentation](../../README.md) - Link to README
+
+### Images
+
+Images work in Markdown pages:
+
+```markdown
+![Alt text](https://example.com/image.png)
 ```
 
-## Maintenance Checklist
+## Learn More
 
-- [ ] Weekly backup verification
-- [ ] Monthly system updates
-- [ ] Quarterly Docker image cleanup
-
-## Important Notes
-
-> **Important**: Always create a snapshot before performing any updates!
-
-For detailed maintenance procedures, refer to the [Maintenance Guide](#maintenance).
+- [Configuration Guide](../../README.md#configuration) - Full config reference
+- [Widget Development](../../docs/WIDGETS.md) - Create custom widgets
+- [Gadget Development](../../docs/GADGETS.md) - Create header gadgets
+- [Development Guide](../../docs/DEVELOPMENT.md) - Project architecture
