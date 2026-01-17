@@ -202,7 +202,9 @@ export function extractWidgets(
 
     // Process widget
     if (item.widget) {
-      const widgetId = `widget-${++widgetCounter}`;
+      // Use path-based stable ID instead of counter
+      // This ensures IDs remain consistent across config reloads
+      const widgetId = `widget-${pathPrefix.replace(/:/g, '-')}`;
 
       widgets.set(widgetId, {
         type: item.widget.type,
@@ -214,7 +216,8 @@ export function extractWidgets(
 
     // Process status check (only if no widget - widgets provide their own status)
     if (item.statuscheck && !item.widget) {
-      const statusCheckId = `status-${++statusCheckCounter}`;
+      // Use path-based stable ID instead of counter
+      const statusCheckId = `status-${pathPrefix.replace(/:/g, '-')}`;
 
       // Normalize config
       const config: StatusCheckFullConfig = item.statuscheck === true
@@ -287,12 +290,11 @@ export function extractWidgets(
 export function extractGadgets(settings: Settings): GadgetRegistry {
   const gadgets = new Map<string, GadgetConfig>();
   const gadgetIds: string[] = [];
-  let gadgetCounter = 0;
 
   const headerGadgets = settings.layout?.header || [];
 
-  function registerGadget(gadget: GadgetConfig, parentId?: string): string {
-    const gadgetId = parentId || `gadget-${++gadgetCounter}`;
+  function registerGadget(gadget: GadgetConfig, idPath: string): string {
+    const gadgetId = idPath;
     gadgets.set(gadgetId, gadget);
 
     // If this is a group, recursively register nested items
@@ -309,8 +311,10 @@ export function extractGadgets(settings: Settings): GadgetRegistry {
     return gadgetId;
   }
 
-  for (const gadget of headerGadgets) {
-    const gadgetId = registerGadget(gadget);
+  // Use index-based stable IDs
+  // This ensures IDs remain consistent across config reloads
+  for (let i = 0; i < headerGadgets.length; i++) {
+    const gadgetId = registerGadget(headerGadgets[i], `gadget-${i}`);
     gadgetIds.push(gadgetId);
   }
 

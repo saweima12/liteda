@@ -57,6 +57,32 @@ services:
 docker compose up -d
 ```
 
+### Configuration Hot Reload
+
+Config hot reload is **enabled by default in dev mode**, **disabled in production**.
+
+```bash
+# Development (default: enabled)
+bun dev
+
+# Development (disable)
+AUTO_RELOAD=false bun dev
+
+# Production (enable - not recommended)
+AUTO_RELOAD=true bun preview
+```
+
+**Behavior:**
+- Development: Config changes trigger automatic server restart
+- Production: Requires `AUTO_RELOAD=true` to enable
+- Browser refresh needed to see changes
+- Invalid config keeps previous valid configuration
+- Features (Docker, K8s) require full server restart
+
+**What's reloaded:**
+- ✅ Settings, services, widgets, gadgets, markdown
+- ❌ Features (side effects like Docker connections)
+
 ## ⚙️ Configuration
 
 All configuration files are in the `config/` directory:
