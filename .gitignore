@@ -46,3 +46,6 @@ config/*.local.yaml
 # Temporary files
 *.cache
 .temp/
+
+# Assistant workspace
+.claude/
