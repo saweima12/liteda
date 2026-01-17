@@ -14,7 +14,7 @@
   },
   "errors": {
     "unknown_widget": "Unknown widget: {{type}}",
-    "unknown_addon": "Unknown addon: {{type}}"
+    "unknown_gadget": "Unknown gadget: {{type}}"
   },
   "empty": {
     "no_content": "No content configured",

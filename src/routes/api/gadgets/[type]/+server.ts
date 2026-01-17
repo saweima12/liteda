@@ -31,7 +31,7 @@ export const GET: RequestHandler = async (event) => {
 
 	const handler = handlerMap.get(type);
 	if (!handler?.GET) {
-		throw error(404, { message: `No GET handler for addon type '${type}'` });
+		throw error(404, { message: `No GET handler for gadget type '${type}'` });
 	}
 
 	try {
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async (event) => {
 	} catch (e) {
 		console.error(`Gadget ${type} GET error:`, e);
 		throw error(500, {
-			message: e instanceof Error ? e.message : 'Failed to fetch addon data',
+			message: e instanceof Error ? e.message : 'Failed to fetch gadget data',
 		});
 	}
 };
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async (event) => {
 
 	const handler = handlerMap.get(type);
 	if (!handler?.POST) {
-		throw error(404, { message: `No POST handler for addon type '${type}'` });
+		throw error(404, { message: `No POST handler for gadget type '${type}'` });
 	}
 
 	try {
@@ -61,7 +61,7 @@ export const POST: RequestHandler = async (event) => {
 	} catch (e) {
 		console.error(`Gadget ${type} POST error:`, e);
 		throw error(500, {
-			message: e instanceof Error ? e.message : 'Failed to process addon request',
+			message: e instanceof Error ? e.message : 'Failed to process gadget request',
 		});
 	}
 };

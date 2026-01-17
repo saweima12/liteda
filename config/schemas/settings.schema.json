@@ -295,11 +295,49 @@
                       "type"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "group"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {
+                          "align": {
+                            "type": "string",
+                            "enum": [
+                              "left",
+                              "center",
+                              "right"
+                            ],
+                            "default": "center",
+                            "description": "Group alignment (left, center, right)"
+                          },
+                          "items": {
+                            "type": "array",
+                            "description": "Nested gadgets in this group (supports all gadget types including nested groups)"
+                          }
+                        },
+                        "required": [
+                          "items"
+                        ],
+                        "additionalProperties": false,
+                        "description": "Group configuration with nested gadgets"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Gadget group container"
                   }
                 ],
-                "description": "Header addon configuration"
+                "description": "Header gadget configuration"
               },
-              "description": "Header addons"
+              "description": "Header gadgets"
             }
           },
           "additionalProperties": false,

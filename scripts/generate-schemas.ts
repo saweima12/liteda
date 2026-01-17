@@ -2,7 +2,7 @@
  * Generate JSON Schemas from Zod schemas for YAML configuration files.
  * This enables IDE autocompletion and validation in VS Code with YAML extension.
  *
- * Automatically discovers widget and addon schemas from their source files.
+ * Automatically discovers widget and gadget schemas from their source files.
  *
  * Usage: bun run scripts/generate-schemas.ts
  */
@@ -14,7 +14,7 @@ import { z, type ZodTypeAny } from 'zod';
 
 const ROOT = process.cwd();
 const WIDGETS_DIR = join(ROOT, 'src/lib/widgets');
-const ADDONS_DIR = join(ROOT, 'src/lib/addons');
+const GADGETS_DIR = join(ROOT, 'src/lib/gadgets');
 
 // ============================================================================
 // Dynamic Schema Discovery
@@ -46,16 +46,19 @@ async function discoverWidgetSchemas(): Promise<Record<string, ZodTypeAny>> {
 	return schemas;
 }
 
-async function discoverAddonSchemas(): Promise<Record<string, ZodTypeAny>> {
+async function discoverGadgetSchemas(): Promise<Record<string, ZodTypeAny>> {
 	const schemas: Record<string, ZodTypeAny> = {};
-	const entries = await readdir(ADDONS_DIR, { withFileTypes: true });
+	const entries = await readdir(GADGETS_DIR, { withFileTypes: true });
+
+	// Directories to skip (not actual gadgets)
+	const skipDirs = new Set(['utils', 'types']);
 
 	for (const entry of entries) {
-		if (!entry.isDirectory() || entry.name.startsWith('_')) continue;
+		if (!entry.isDirectory() || entry.name.startsWith('_') || skipDirs.has(entry.name)) continue;
 
-		// Try to load types.ts first (for addons with varsSchema)
-		const typesPath = join(ADDONS_DIR, entry.name, 'types.ts');
-		const metaPath = join(ADDONS_DIR, entry.name, 'meta.ts');
+		// Try to load types.ts first (for gadgets with varsSchema)
+		const typesPath = join(GADGETS_DIR, entry.name, 'types.ts');
+		const metaPath = join(GADGETS_DIR, entry.name, 'meta.ts');
 
 		try {
 			// Try types.ts for varsSchema
@@ -66,22 +69,22 @@ async function discoverAddonSchemas(): Promise<Record<string, ZodTypeAny>> {
 
 				if (varsSchema) {
 					const metaModule = await import(metaPath);
-					const addon = metaModule.default;
-					schemas[entry.name] = varsSchema.optional().describe(addon?.description || `${entry.name} addon`);
+					const gadget = metaModule.default;
+					schemas[entry.name] = varsSchema.optional().describe(gadget?.description || `${entry.name} gadget`);
 					continue;
 				}
 			} catch {
 				// types.ts doesn't exist or doesn't have varsSchema
 			}
 
-			// Fallback: addon without varsSchema (empty object)
+			// Fallback: gadget without varsSchema (empty object)
 			const metaModule = await import(metaPath);
-			const addon = metaModule.default;
-			if (addon?.name) {
-				schemas[entry.name] = z.object({}).optional().describe(addon.description || `${entry.name} addon`);
+			const gadget = metaModule.default;
+			if (gadget?.name) {
+				schemas[entry.name] = z.object({}).optional().describe(gadget.description || `${entry.name} gadget`);
 			}
 		} catch (err) {
-			console.warn(`Warning: Could not load addon ${entry.name}:`, (err as Error).message);
+			console.warn(`Warning: Could not load gadget ${entry.name}:`, (err as Error).message);
 		}
 	}
 
@@ -97,9 +100,9 @@ async function buildSchemas() {
 	const widgetSchemas = await discoverWidgetSchemas();
 	console.log(`  Found ${Object.keys(widgetSchemas).length} widgets:`, Object.keys(widgetSchemas).join(', '));
 
-	console.log('Discovering addon schemas...');
-	const addonSchemas = await discoverAddonSchemas();
-	console.log(`  Found ${Object.keys(addonSchemas).length} addons:`, Object.keys(addonSchemas).join(', '));
+	console.log('Discovering gadget schemas...');
+	const gadgetSchemas = await discoverGadgetSchemas();
+	console.log(`  Found ${Object.keys(gadgetSchemas).length} gadgets:`, Object.keys(gadgetSchemas).join(', '));
 
 	// Widget config with discriminated union for vars
 	const widgetVarsSchemas = Object.entries(widgetSchemas).map(([type, varsSchema]) =>
@@ -117,20 +120,33 @@ async function buildSchemas() {
 					.describe('Widget configuration')
 			: z.object({ type: z.string() }).describe('Widget configuration');
 
-	// Addon config with discriminated union for vars
-	const addonVarsSchemas = Object.entries(addonSchemas).map(([type, varsSchema]) =>
+	// Gadget config with discriminated union for vars
+	// Including 'group' type for recursive gadget containers
+	const gadgetVarsSchemas = Object.entries(gadgetSchemas).map(([type, varsSchema]) =>
 		z.object({
 			type: z.literal(type),
 			vars: varsSchema,
 		})
 	);
 
-	const addonConfigSchema =
-		addonVarsSchemas.length > 0
+	// Add 'group' type that can contain nested gadgets
+	const groupGadgetSchema = z.object({
+		type: z.literal('group'),
+		vars: z.object({
+			align: z.enum(['left', 'center', 'right']).default('center').describe('Group alignment (left, center, right)'),
+			items: z.array(z.any()).describe('Nested gadgets in this group (supports all gadget types including nested groups)'),
+		}).optional().describe('Group configuration with nested gadgets'),
+	}).describe('Gadget group container');
+
+	// Combine all gadget schemas including group
+	const allGadgetSchemas = [...gadgetVarsSchemas, groupGadgetSchema];
+
+	const gadgetConfigSchema =
+		allGadgetSchemas.length > 0
 			? z
-					.discriminatedUnion('type', addonVarsSchemas as [z.ZodObject<any>, ...z.ZodObject<any>[]])
-					.describe('Header addon configuration')
-			: z.object({ type: z.string() }).describe('Header addon configuration');
+					.discriminatedUnion('type', allGadgetSchemas as [z.ZodObject<any>, ...z.ZodObject<any>[]])
+					.describe('Header gadget configuration')
+			: z.object({ type: z.string() }).describe('Header gadget configuration');
 
 	// Status check configuration
 	const statusCheckConfigSchema = z.union([
@@ -222,7 +238,7 @@ async function buildSchemas() {
 				.object({
 					columns: z.number().min(1).max(6).default(3).describe('Number of columns (1-6)'),
 					style: z.enum(['grid', 'masonry']).default('grid').describe('Layout style'),
-					header: z.array(addonConfigSchema).optional().describe('Header addons'),
+					header: z.array(gadgetConfigSchema).optional().describe('Header gadgets'),
 				})
 				.optional()
 				.describe('Layout configuration'),

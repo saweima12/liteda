@@ -75,9 +75,19 @@ export const pageSchema = z.object({
 });
 
 // Gadget config schema (for Bar items)
-export const gadgetConfigSchema = z.object({
-  type: z.string(),
-}).passthrough(); // Allow additional properties for gadget-specific config
+// Supports recursive structure for group type
+type GadgetConfigType = {
+  type: string;
+  vars?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
+export const gadgetConfigSchema: z.ZodType<GadgetConfigType> = z.lazy(() =>
+  z.object({
+    type: z.string(),
+    vars: z.record(z.unknown()).optional(),
+  }).passthrough()
+);
 
 // Feature config schema
 export const featureConfigSchema = z.object({

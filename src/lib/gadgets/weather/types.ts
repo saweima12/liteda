@@ -38,7 +38,7 @@ export const WEATHER_CODES = {
 export type WeatherCode = keyof typeof WEATHER_CODES;
 
 /**
- * Addon configuration variables (from settings.yaml)
+ * Gadget configuration variables (from settings.yaml)
  */
 export const weatherVarsSchema = z.object({
 	// Location (required)
@@ -57,7 +57,7 @@ export const weatherVarsSchema = z.object({
 });
 
 /**
- * Full addon config schema (with passthrough for flexibility)
+ * Full gadget config schema (with passthrough for flexibility)
  */
 export const weatherConfigSchema = z.object({
 	type: z.literal('weather'),

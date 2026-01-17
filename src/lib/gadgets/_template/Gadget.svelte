@@ -9,5 +9,5 @@
 </script>
 
 <div>
-  <!-- Your addon content here -->
+  <!-- Your gadget content here -->
 </div>

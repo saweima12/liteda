@@ -14,7 +14,7 @@
   },
   "errors": {
     "unknown_widget": "未知小工具：{{type}}",
-    "unknown_addon": "未知擴充功能：{{type}}"
+    "unknown_gadget": "未知小工具：{{type}}"
   },
   "empty": {
     "no_content": "尚未設定內容",

@@ -282,6 +282,7 @@ export function extractWidgets(
 /**
  * Extract gadgets from settings header and generate IDs
  * Returns gadget registry with unique IDs for each gadget instance
+ * Also handles nested gadgets inside groups
  */
 export function extractGadgets(settings: Settings): GadgetRegistry {
   const gadgets = new Map<string, GadgetConfig>();
@@ -290,9 +291,26 @@ export function extractGadgets(settings: Settings): GadgetRegistry {
 
   const headerGadgets = settings.layout?.header || [];
 
-  for (const gadget of headerGadgets) {
-    const gadgetId = `gadget-${++gadgetCounter}`;
+  function registerGadget(gadget: GadgetConfig, parentId?: string): string {
+    const gadgetId = parentId || `gadget-${++gadgetCounter}`;
     gadgets.set(gadgetId, gadget);
+
+    // If this is a group, recursively register nested items
+    if (gadget.type === 'group' && gadget.vars && typeof gadget.vars === 'object') {
+      const groupVars = gadget.vars as { items?: GadgetConfig[] };
+      if (Array.isArray(groupVars.items)) {
+        groupVars.items.forEach((item, index) => {
+          const subGadgetId = `${gadgetId}-${index}`;
+          registerGadget(item, subGadgetId);
+        });
+      }
+    }
+
+    return gadgetId;
+  }
+
+  for (const gadget of headerGadgets) {
+    const gadgetId = registerGadget(gadget);
     gadgetIds.push(gadgetId);
   }
 

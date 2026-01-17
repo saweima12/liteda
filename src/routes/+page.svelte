@@ -18,7 +18,7 @@
   const defaultColumns = $derived(settings.layout?.columns ?? 3);
   const headerItems = $derived(settings.layout?.header);
 
-  // Provide settings to child components (for addons like title)
+  // Provide settings to child components (for gadgets like title)
   // Using a getter so derived value stays reactive
   setContext('settings', {
     get current() { return settings; }

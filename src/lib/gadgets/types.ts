@@ -11,6 +11,7 @@ export interface GadgetProps<TConfig = Record<string, unknown>> {
 /** Gadget configuration from YAML */
 export interface GadgetConfig {
   type: string;
+  vars?: unknown;
   [key: string]: unknown;
 }
 
