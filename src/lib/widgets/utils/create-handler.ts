@@ -20,7 +20,7 @@ export interface CreateHandlerOptions<TVars, TData> {
 
   /**
    * Cache TTL in milliseconds
-   * If not provided, uses the widget's interval or default (5000ms)
+   * If not provided, uses the widget's interval or default (10000ms)
    * Set to 0 to disable caching for this handler
    */
   cacheTtl?: number;
@@ -84,8 +84,8 @@ export function createHandler<TVars = unknown, TData = unknown>(
     }
 
     // Determine cache TTL
-    // Priority: handler option > widget interval > default (5000ms)
-    const cacheTtl = options.cacheTtl ?? config.interval ?? 5000;
+    // Priority: handler option > widget interval > default (10000ms)
+    const cacheTtl = options.cacheTtl ?? config.interval ?? 10000;
 
     // Call the fetch function with caching and timing
     const startTime = Date.now();
