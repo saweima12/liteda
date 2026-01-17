@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=./schemas/services.schema.json
+
+# Home Page Services
+
+# Example: Service group with items
+- name: Quick Access
+  columns: 2
+  items:
+    - name: Portainer
+      icon: portainer
+      url: https://portainer.local
+      description: Container management
+      # Uncomment to add live widget
+      # widget:
+      #   type: portainer
+      #   interval: 10000
+      #   vars:
+      #     url: https://portainer.local
+      #     key: "your-api-key"
+      #     env: 1
+
+    - name: Proxmox
+      icon: proxmox
+      url: https://pve.local
+      description: Virtualization platform
+
+    - name: Grafana
+      icon: grafana
+      url: https://grafana.local
+      description: Metrics dashboard
+
+    - name: Jellyfin
+      icon: jellyfin
+      url: https://jellyfin.local
+      description: Media server
+
+# Example: Nested groups
+- name: Infrastructure
+  icon: server
+  columns: 2
+  groups:
+    - name: Monitoring
+      items:
+        - name: Uptime Kuma
+          icon: uptime-kuma
+          url: https://uptime.local
+          description: Uptime monitoring
+        
+        - name: Prometheus
+          icon: prometheus
+          url: https://prometheus.local
+          description: Monitoring system
+
+    - name: Network
+      items:
+        - name: Nginx Proxy Manager
+          icon: nginx-proxy-manager
+          url: https://npm.local
+          description: Reverse proxy
+        
+        - name: Cloudflared
+          icon: cloudflare
+          url: https://cloudflare.local
+          description: Tunnel manager
+
+# Example: Bookmarks (compact tags style)
+- name: Quick Links
+  type: bookmarks
+  items:
+    - name: Google
+      url: https://google.com
+      icon: google
+    
+    - name: GitHub
+      url: https://github.com
+      icon: github
+    
+    - name: YouTube
+      url: https://youtube.com
+      icon: youtube
+    
+    - name: Reddit
+      url: https://reddit.com
+      icon: reddit

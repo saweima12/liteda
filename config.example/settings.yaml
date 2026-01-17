@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=./schemas/settings.schema.json
+
+# Liteda Settings
+title: My Homelab
+
+# Theme: light, dark, or auto
+theme: dark
+
+# Background (optional)
+# background:
+#   image: https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920
+#   opacity: 0.3
+#   blur: 2
+
+# Layout
+layout:
+  columns: 3
+  
+  # Header gadgets
+  header:
+    # Left side: System resources
+    - type: resources
+      vars:
+        cpu: true
+        memory: true
+        disk: /
+        refresh: 10000
+    
+    # Push to right
+    - type: spacer
+    
+    # Right side: Weather, search, theme
+    - type: weather
+      vars:
+        latitude: 25.0330
+        longitude: 121.5654
+        label: "Taipei"
+        units: metric
+        refresh: 600000
+    
+    - type: search
+    - type: theme-switcher
+
+# Pages (optional - if not set, services.yaml is used as single page)
+pages:
+  - id: home
+    name: Home
+    icon: home
+    file: services.yaml
+  # - id: media
+  #   name: Media
+  #   icon: play
+  #   file: pages/media.yaml
+  # - id: notes
+  #   name: Notes
+  #   icon: folder
+  #   file: pages/notes.md
+
+# Custom CSS (optional)
+# customCss: |
+#   .custom-class { color: red; }
