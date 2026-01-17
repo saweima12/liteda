@@ -35,27 +35,66 @@ bun preview
 
 ### Using Docker
 
-```bash
-docker build -t liteda .
-docker run -p 3000:3000 -v ./config:/app/config liteda
-```
-
-Or with docker-compose:
-
-```yaml
-services:
-  liteda:
-    build: .
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./config:/app/config
-    restart: unless-stopped
-```
+**Quick Start:**
 
 ```bash
+# 1. Clone repository
+git clone https://github.com/your-username/liteda.git
+cd liteda
+
+# 2. Start with Docker Compose (config auto-initialized on first run)
 docker compose up -d
+
+# 3. Visit http://localhost:3000
 ```
+
+**Configuration:**
+
+Config files are automatically created in `./config/` on first run with sensible defaults.
+
+To customize:
+
+```bash
+# Edit settings
+nano config/settings.yaml
+
+# Edit services
+nano config/services.yaml
+
+# Restart to apply changes
+docker compose restart
+```
+
+**Manual Docker Run:**
+
+```bash
+# Build image
+docker build -t liteda .
+
+# Create config directory
+mkdir -p config
+
+# Run container
+docker run -d \
+  --name liteda \
+  -p 3000:3000 \
+  -v ./config:/app/config \
+  --restart unless-stopped \
+  liteda
+```
+
+**Local Development with Docker:**
+
+For development with hot reload:
+
+```bash
+# Use dev compose file
+docker compose -f docker-compose.dev.yml up
+
+# Visit http://localhost:5173 (Vite dev server)
+```
+
+This mounts your source code into the container for live reload.
 
 ### Configuration Hot Reload
 
@@ -369,6 +408,69 @@ Server caches the API response for 10s, so multiple clients share the same data.
 - [mode-watcher](https://github.com/svecosystem/mode-watcher) - Theme management
 - [unplugin-icons](https://github.com/unplugin/unplugin-icons) - Icon components (Lucide)
 - [Dashboard Icons](https://github.com/walkxcode/dashboard-icons) - Service icons via CDN
+
+## 🔧 Troubleshooting
+
+### Permission denied on config files (Docker)
+
+If you can't edit `config/settings.yaml` after starting with Docker:
+
+**Quick Fix (Recommended):**
+```bash
+sudo chown -R $(id -u):$(id -g) config/
+```
+
+**Alternative (Permanent):**
+Edit `docker-compose.yml` and uncomment the `user:` line:
+```yaml
+user: "${UID:-1000}:${GID:-1000}"
+```
+
+Then restart:
+```bash
+docker compose down && docker compose up -d
+```
+
+### Widget shows "offline" but service is running
+
+**If using Docker:**
+1. Check the widget URL is accessible from inside the container
+2. For services on the host, use `host.docker.internal` instead of `localhost`:
+   ```yaml
+   widget:
+     vars:
+       url: http://host.docker.internal:9000  # Not localhost:9000
+   ```
+3. Or enable Docker widget with socket mount (see docker-compose.yml)
+
+**General checks:**
+- Verify the API endpoint URL is correct
+- Check the API key is set in `vars`
+- Look at container logs: `docker logs liteda`
+
+### Config changes not taking effect
+
+**Docker:**
+```bash
+docker compose restart
+```
+
+**Bun (with AUTO_RELOAD=false):**
+```bash
+# Stop and restart
+bun preview
+```
+
+### Health check failing
+
+Check if the server is running:
+```bash
+# Docker
+docker logs liteda
+
+# Test health endpoint
+curl http://localhost:3000/health
+```
 
 ## 📚 Documentation
 
