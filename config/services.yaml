@@ -62,6 +62,21 @@
       url: https://hub.docker.com
       description: Container registry
 
+- name: Docker Containers
+  icon: docker
+  type: docker-group
+  vars:
+    refreshInterval: 30000
+    columns: 3
+    # Optional: URL template for container links
+    # Tokens: {name}, {id}, {image}, {state}
+    # urlTemplate: "http://localhost:8080/{name}"
+    # Optional: Filter by labels
+    # includeLabels:
+    #   - "homepage.enable=true"
+    # excludeLabels:
+    #   - "homepage.hide=true"
+
 - name: Tools
   type: compact
   items:

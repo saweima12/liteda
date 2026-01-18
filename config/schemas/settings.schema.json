@@ -390,6 +390,27 @@
             "description": "Page configuration"
           },
           "description": "Additional pages"
+        },
+        "features": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": true,
+                "description": "Enable feature"
+              },
+              "vars": {
+                "type": "object",
+                "additionalProperties": {},
+                "description": "Feature configuration"
+              }
+            },
+            "additionalProperties": false,
+            "description": "Feature configuration"
+          },
+          "description": "Feature configuration"
         }
       },
       "additionalProperties": false,

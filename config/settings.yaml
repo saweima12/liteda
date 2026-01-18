@@ -65,6 +65,29 @@ pages:
     name: Notes
     icon: folder
     file: pages/notes.md
+
+# Features (optional)
+features:
+  example-feature:
+    enabled: true
+    vars:
+      groupName: "Example Feature Services"
+      groupIcon: "docker"
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      targetPages:
+        - home
+      groupName: "Docker Containers"
+      groupIcon: "docker"
+      refreshInterval: 30000
+      columns: 3
+      # includeLabels:
+      #   - liteda.enable=true
+      # excludeLabels:
+      #   - liteda.hide=true
+
 # Custom CSS (optional)
 # customCss: |
 #   .custom-class { color: red; }

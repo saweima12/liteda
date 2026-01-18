@@ -1,4 +1,42 @@
-import type { PageContent } from '$lib/config/schema';
+import type { Component } from 'svelte';
+import type { RequestHandler } from '@sveltejs/kit';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FeatureGroupComponent = Component<any, any, any>;
+import type { z } from 'zod';
+
+/**
+ * Feature metadata - declared in meta.ts
+ * Meta itself is lazy-loaded when the feature is enabled
+ */
+export interface FeatureMeta {
+  /** Feature name */
+  name: string;
+
+  /** Feature version */
+  version: string;
+
+  /** Feature description */
+  description: string;
+
+  /** Config schema */
+  varsSchema: z.ZodSchema;
+
+  /**
+   * Group component registration (lazy loader)
+   * Key: group type (e.g., 'docker-group')
+   */
+  groups?: Record<string, () => Promise<{ default: FeatureGroupComponent }>>;
+
+  /**
+   * API handlers (lazy loader)
+   * Key: handler type (e.g., 'docker-group')
+   */
+  handlers?: Record<
+    string,
+    () => Promise<{ GET?: RequestHandler; POST?: RequestHandler }>
+  >;
+}
 
 /**
  * Feature interface - all features must implement this
@@ -19,9 +57,8 @@ export interface Feature {
    * Called at server startup if feature is enabled
    *
    * @param vars - Feature configuration vars from settings.yaml
-   * @param pagesContent - Map of page content (can be modified to inject services)
    */
-  init(vars: unknown, pagesContent: Map<string, PageContent>): Promise<void>;
+  init(vars: unknown): Promise<void>;
 
   /**
    * Optional cleanup on server shutdown
@@ -35,4 +72,12 @@ export interface Feature {
 export interface FeatureConfig {
   enabled: boolean;
   vars?: Record<string, unknown>;
+}
+
+/**
+ * Feature registry entry
+ */
+export interface FeatureRegistryEntry {
+  meta: () => Promise<{ meta: FeatureMeta }>;
+  feature: () => Promise<{ default: Feature }>;
 }

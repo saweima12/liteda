@@ -228,6 +228,13 @@ async function buildSchemas() {
 		})
 		.describe('Page configuration');
 
+	const featureConfigSchema = z
+		.object({
+			enabled: z.boolean().default(true).describe('Enable feature'),
+			vars: z.record(z.unknown()).optional().describe('Feature configuration'),
+		})
+		.describe('Feature configuration');
+
 	// Settings schema
 	const settingsSchema = z
 		.object({
@@ -259,6 +266,7 @@ async function buildSchemas() {
 				.optional()
 				.describe('Internationalization settings'),
 			pages: z.array(pageSchema).optional().describe('Additional pages'),
+			features: z.record(featureConfigSchema).optional().describe('Feature configuration'),
 		})
 		.describe('Global settings configuration');
 

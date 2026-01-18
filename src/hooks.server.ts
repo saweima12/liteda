@@ -2,10 +2,39 @@ import type { ServerInit } from '@sveltejs/kit';
 import { loadSettings, loadAllPages, extractWidgets, extractGadgets, setCachedConfig, type Page } from '$config';
 import { updateWidgetConfigs } from '$lib/widgets';
 import { updateGadgetConfigs } from '$lib/gadgets/config-store';
+import { dev } from '$app/environment';
 import { updateStatusCheckConfigs } from '$lib/status-check';
 import { initI18n } from '$lib/i18n';
-import { loadFeatures } from '$lib/features';
+import { destroyFeatures, ensureFeatureGroupsRegistered, loadFeatures } from '$lib/features';
+import { updateFeatureConfigs } from '$lib/features/config-store';
+import { buildFeatureConfigs } from '$lib/features/feature-configs';
 import { watch } from 'fs';
+
+let cleanupRegistered = false;
+
+function registerFeatureCleanup() {
+    if (cleanupRegistered || dev) {
+        return;
+    }
+
+    cleanupRegistered = true;
+
+    const cleanup = async () => {
+        await destroyFeatures();
+    };
+
+    process.on('SIGINT', () => {
+        cleanup().catch((error) => {
+            console.error('[Features] Failed to destroy features on SIGINT:', error);
+        });
+    });
+
+    process.on('SIGTERM', () => {
+        cleanup().catch((error) => {
+            console.error('[Features] Failed to destroy features on SIGTERM:', error);
+        });
+    });
+}
 
 /**
  * Load all configuration (can be called multiple times for hot reload)
@@ -29,7 +58,8 @@ async function loadConfiguration(isInitialLoad = false) {
     // Features are ONLY loaded on initial startup, not on hot reload
     // This is because features may have side effects (e.g., Docker connections)
     if (isInitialLoad && settings.features) {
-        await loadFeatures(settings.features, pagesContent);
+        await ensureFeatureGroupsRegistered();
+        await loadFeatures(settings.features);
         console.log('[Config] Features loaded (changes require server restart)');
     } else if (!isInitialLoad && settings.features) {
         console.warn('[Config] Feature changes detected but ignored. Restart server to apply feature changes.');
@@ -41,6 +71,7 @@ async function loadConfiguration(isInitialLoad = false) {
     updateWidgetConfigs(widgets);
     updateGadgetConfigs(gadgets);
     updateStatusCheckConfigs(statusChecks);
+    updateFeatureConfigs(buildFeatureConfigs(pagesContent));
     setCachedConfig({
         settings,
         pagesContent,
@@ -67,8 +98,7 @@ async function loadConfiguration(isInitialLoad = false) {
  */
 function watchConfigFiles() {
     // Skip in Vite dev mode (handled by Vite plugin in vite.config.ts)
-    // DEV is set by SvelteKit in development mode
-    if (process.env.DEV === 'true') {
+    if (dev) {
         return;
     }
 
@@ -140,6 +170,8 @@ function watchConfigFiles() {
 export const init: ServerInit = async () => {
     // Initial configuration load (with features)
     await loadConfiguration(true);
+
+    registerFeatureCleanup();
 
     // Start config file watcher (only if AUTO_RELOAD=true)
     watchConfigFiles();

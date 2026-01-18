@@ -4,6 +4,8 @@
   import CompactCard from './CompactCard.svelte';
   import IconExternalLink from '~icons/lucide/external-link';
   import { getGroupRenderer, hasCustomRenderer } from '$lib/features/group-registry';
+  import { ensureFeatureGroupsRegistered } from '$lib/features/registry';
+  import { createFeatureGroupId } from '$lib/features/group-id';
 
   interface Props {
     group: ServiceGroupType;
@@ -15,11 +17,48 @@
 
   let { group, defaultColumns = 3, pageId = '', widgetIds = {}, statusIds = {} }: Props = $props();
 
-  const hasCustom = $derived(hasCustomRenderer(group.type));
-  const CustomRenderer = $derived(hasCustom ? getGroupRenderer(group.type) : null);
+  let CustomRenderer = $state<Awaited<ReturnType<typeof getGroupRenderer>> | null>(null);
+
+  $effect(() => {
+    let active = true;
+    const type = group.type;
+    if (type === 'services' || type === 'bookmarks' || type === 'compact') {
+      CustomRenderer = null;
+      return;
+    }
+
+    (async () => {
+      try {
+        await ensureFeatureGroupsRegistered();
+
+        if (!hasCustomRenderer(type)) {
+          CustomRenderer = null;
+          console.warn(
+            `Unknown group type "${type}" with no registered renderer. ` +
+              'Did you forget to enable the feature?'
+          );
+          return;
+        }
+
+        const renderer = await getGroupRenderer(type);
+        if (active) {
+          CustomRenderer = renderer ?? null;
+        }
+      } catch (error) {
+        console.error(`[ContentGroup] Failed to load renderer "${type}":`, error);
+        if (active) {
+          CustomRenderer = null;
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  });
 
   // Unique identifier for this group instance (useful for custom renderers)
-  const groupId = $derived(`${pageId}:${group.name}`);
+  const groupId = $derived(createFeatureGroupId(pageId, group.name));
 
   // Check if this is a nested group (has groups) or flat group (has items)
   const isNested = $derived(group.groups && group.groups.length > 0);
@@ -69,7 +108,12 @@
 </script>
 
 {#if CustomRenderer}
-  <CustomRenderer config={(group as unknown as { vars?: Record<string, unknown> }).vars || {}} {groupId} />
+  <CustomRenderer
+    config={(group as unknown as { vars?: Record<string, unknown> }).vars || {}}
+    {group}
+    showName={group.showName ?? true}
+    {groupId}
+  />
 {:else if isNested}
   <!-- Nested group: outer group is a section header -->
   <section class="space-y-6">
