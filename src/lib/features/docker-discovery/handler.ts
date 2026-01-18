@@ -17,10 +17,7 @@ export const GET: RequestHandler = createFeatureHandler({
   async fetch(vars, context) {
     // Extract urlTemplate from group config
     // SECURITY: vars are validated, urlTemplate is retrieved from server-side config
-    const urlTemplate =
-      typeof context.config.vars?.urlTemplate === 'string'
-        ? context.config.vars.urlTemplate
-        : undefined;
+    const urlTemplate = vars.urlTemplate;
 
     // Fetch containers from Docker
     const docker = getDockerClient();

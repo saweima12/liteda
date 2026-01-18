@@ -7,4 +7,5 @@ export interface DockerContainer {
   state: DockerState;
   status: string;
   ports: Array<{ private: number; public?: number; type: string }>;
+  url?: string;
 }
