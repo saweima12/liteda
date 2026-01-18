@@ -6,36 +6,34 @@
 # Development
 bun dev                 # Start dev server on http://0.0.0.0:5173
 
-# Build
-bun run build           # Production build
+# Build & Preview
+bun run build           # Production build (includes schema generation)
 bun preview             # Preview production build
 
-# Type checking
-bun run check           # Run svelte-check
-
-# Testing
-# No test framework configured. Add vitest/uvu if needed.
+# Maintenance
+bun run check           # Run svelte-check for types and syntax
+bun run schema          # Regenerate JSON schemas for YAML validation
 ```
 
 ## Code Style
 
 ### TypeScript & Type Safety
-- Strict mode enabled in `tsconfig.json`
-- Always use Zod schemas for data validation (config, widget data, vars, etc.)
-- Export types inferred from Zod: `type MyData = z.infer<typeof mySchema>`
-- Use `z.infer<typeof>` to ensure types stay in sync with schemas
-- Prefer specific types over `any` or `unknown`
-- Type imports: `import type { ... } from '...'`
+- **Strict Mode**: Enabled in `tsconfig.json`.
+- **Zod Validation**: Always use Zod schemas for config, data, and variables.
+- **Type Inference**: Export types inferred from schemas: `export type MyData = z.infer<typeof mySchema>`.
+- **Type Imports**: Use `import type { ... } from '...'`.
+- **No `any`**: Prefer specific types over `any` or `unknown`.
 
 ### Svelte 5 Runes
-- Use `$state` for reactive state variables
-- Use `$derived` for computed values
-- Use `$effect` for side effects (cleanup function supported)
-- Use `$props` for component props (destructure directly: `let { prop } = $props()`)
-- **Don't destructure reactive objects** - breaks reactivity. Access properties directly.
-- Example: `const widget = useWidget(...)` not `const { data } = useWidget(...)`
+- **Reactivity**: Use `$state` for reactive variables.
+- **Computations**: Use `$derived` for values derived from other state.
+- **Effects**: Use `$effect` for side effects (ensure proper cleanup).
+- **Props**: Use `$props()` and destructure directly: `let { prop } = $props()`.
+- **Destructuring**: **Don't destructure reactive objects** (like widget state) - breaks reactivity. Access properties directly.
+- Example: `const widget = useWidget(...)` not `const { data } = widget`.
 
 ### Widget System Patterns
+Widgets are auto-discovered live data components in `src/lib/widgets/[name]/`.
 
 **Creating a widget:**
 1. Copy template: `cp -r src/lib/widgets/_template src/lib/widgets/my-widget`
@@ -54,166 +52,48 @@ bun run check           # Run svelte-check
      cacheTtl: 10000, // Optional custom TTL
    });
    ```
-4. Build UI in `Widget.svelte` using `useWidget()` composable
-5. No registration needed - auto-discovered via Vite glob
+4. Build UI in `Widget.svelte` using `useWidget()` composable.
+5. Auto-discovered via Vite glob in `src/lib/widgets/registry.ts`.
 
-**Widget component pattern:**
-```svelte
-<script lang="ts">
-  import { useWidget } from '$lib/widgets/utils';
-  import widgetDef from './meta';
+### Gadget System Patterns
+Gadgets are header bar components in `src/lib/gadgets/[name]/`.
 
-  let { config, onStatus }: WidgetProps = $props();
-  const widget = useWidget(widgetDef, () => config);
+**Built-in Gadgets:**
+- `title`, `spacer`, `theme-switcher`, `search`, `resources`, `weather`, `group`.
 
-  $effect(() => {
-    onStatus?.(new CustomEvent('status', {
-      detail: { status: widget.status, latency: widget.latency }
-    }));
-  });
-</script>
-```
+**Creating a gadget:**
+1. Create folder: `src/lib/gadgets/my-gadget/`
+2. Define `meta.ts` with `defineGadget()`.
+3. Create `Gadget.svelte` with UI.
+4. (Optional) Use `createGadgetHandler()` in `handler.ts` if server-side data is needed.
+5. Auto-discovered via Vite glob in `src/lib/gadgets/registry.ts`.
 
-### Zod Schema Patterns
-- Use `z.object()` for compound types
-- Use `.optional()` for optional fields
-- Use `.default(value)` for defaults on optional fields
-- Use `.passthrough()` for addon configs (allow extra properties)
-- Use `.refine()` for custom validation logic
-- Export schemas and types:
-  ```ts
-  const schema = z.object({ ... });
-  export { schema };
-  export type MyType = z.infer<typeof schema>;
-  ```
+### Features System Patterns
+Features are lazy-loaded, complex extensions in `src/lib/features/[name]/`.
 
-### Error Handling
-- Widget handlers: Always return JSON with `{ data, status, latency, checkedAt }` (handled by `createHandler()`)
-- Use `throw error(statusCode, { message })` from `@sveltejs/kit` for HTTP errors
-- Log errors with `console.error()` before throwing/returning
-- For fetch errors in widgets: throw - handler converts to `status: 'offline'`
+1. **`meta.ts`**: Metadata, schemas, and lazy loaders.
+2. **`index.ts`**: Implementation of `Feature` interface (`init`, `destroy`).
+3. **Manual Registration**: Add to `src/lib/features/registry.ts`.
+4. **Lazy Loading**: Only imported if enabled in `settings.yaml`.
 
-### Naming Conventions
-- Files: kebab-case for components, kebab-case for utilities
-- Variables: camelCase (e.g., `currentPageId`, `serviceWidgetIds`)
-- Types/Interfaces: PascalCase (e.g., `ServiceGroup`, `WidgetConfig`)
-- Constants: UPPER_SNAKE_CASE for static values (e.g., `CONFIG_DIR`)
-- Components: PascalCase with `.svelte` extension
-- Functions: camelCase with descriptive verbs (e.g., `loadSettings`, `extractWidgets`)
+### UI & Icons
+- **shadcn-svelte**: Use the CLI to add components: `bun x shadcn-svelte@latest add <component>`.
+- **Icons**: Always use `unplugin-icons` for Lucide icons: `import IconSearch from '~icons/lucide/search'`.
+- **Standard Components**: Use `src/lib/components/widget-ui/` helpers (Block, Row, Cell, Status, Metric).
 
-### Import Patterns
-- Use path aliases defined in `svelte.config.js`:
-  - `$components` → `src/lib/components`
-  - `$widgets` → `src/lib/widgets`
-  - `$config` → `src/lib/config`
-- Group imports:
-  ```ts
-  import { readFile } from 'fs/promises';
-  import { error } from '@sveltejs/kit';
-  import { z } from 'zod';
-  import { createHandler } from '$lib/widgets/utils/create-handler';
-  import type { RequestHandler } from '@sveltejs/kit';
-  ```
-- Icon imports via unplugin-icons: `import IconSettings from '~icons/lucide/settings'`
+### Internationalization (i18n)
+- Use `$t` store from `src/lib/i18n/`.
+- Translations in `src/lib/i18n/translations/`.
 
-### Security
-- **Never** expose widget `vars` (API keys, secrets) to client
-- Widget handlers run server-side via `createHandler()` - config retrieved from server-side store
-- Use `@ts-expect-error` for Bun-specific TLS options in fetch calls
-- Sanitize markdown input via `marked` library
+## Security
+- **Never** expose `vars` (API keys, secrets) to client.
+- Widget/Gadget handlers run server-side via `createHandler()` / `createGadgetHandler()`.
+- Use `@ts-expect-error` for Bun-specific TLS options in fetch if needed.
 
-### File Organization
-- Widgets: `src/lib/widgets/[name]/` with `meta.ts`, `handler.ts`, `Widget.svelte`
-- Addons: `src/lib/addons/[name]/` with `meta.ts`, `Gadget.svelte` (optionally `types.ts`, `utils.ts`)
-  - Addons with API calls: Add API route in `src/routes/api/[name]/+server.ts`
-  - Example: weather addon has `types.ts`, `utils.ts`, and `/api/weather` route
-- Config: `src/lib/config/` with loader, schema, cache
-- Routes: SvelteKit conventions (`+page.svelte`, `+page.server.ts`, etc.)
-- Components: Reusable in `src/lib/components/ui/` (shadcn-svelte) and `src/lib/components/widget-ui/`
-
-### Comments
-- Add comments only for non-obvious logic
-- Use `//` for single-line, `/* */` for multi-line
-- Document widget schemas with inline comments
-
-### Server-Side Code
-- Use `import { error } from '@sveltejs/kit'` for HTTP errors
-- Server hooks: `src/hooks.server.ts` (e.g., `export const init`)
-- Load config at startup and cache - don't re-parse on every request
-- Use `fs/promises` for async file operations
-
-### Client-Side Code
-- Use `$app/environment` for browser checks: `if (browser) { ... }`
-- Use `$app/stores` for page data and navigation
-- Use `onMount` for browser-only side effects with cleanup
-- Use `window.addEventListener` in `onMount` with proper cleanup
-
-### Addon System Patterns
-
-**Built-in Addons:**
-- `title` - Display site title
-- `spacer` - Flexible spacer (pushes subsequent items to the right)
-- `theme-switcher` - Light/dark theme toggle
-- `search` - Global search
-- `resources` - System resources monitor
-- `weather` - Current weather display with popover
-
-**Creating an addon:**
-1. Create folder: `src/lib/addons/my-addon/`
-2. Define `meta.ts` with `defineAddon()`
-3. Create `Gadget.svelte` with UI
-4. (Optional) Add `types.ts` for Zod schemas if needed
-5. (Optional) Add `utils.ts` for helper functions
-6. (Optional) Add API route in `src/routes/api/my-addon/+server.ts` if addon needs server-side data
-7. No registration needed - auto-discovered via Vite glob
-
-**Addon with API pattern (like weather):**
-```ts
-// src/lib/addons/weather/types.ts
-export const weatherVarsSchema = z.object({
-  latitude: z.number(),
-  longitude: z.number(),
-  label: z.string().optional(),
-  units: z.enum(['metric', 'imperial']).default('metric'),
-  refresh: z.number().default(600000), // Client-side refresh interval
-  cache: z.number().default(5),        // Server-side cache TTL (minutes)
-});
-
-// src/routes/api/weather/+server.ts
-export const GET: RequestHandler = async ({ url }) => {
-  // Parse params, check cache, fetch data, return JSON
-};
-
-// src/lib/addons/weather/Gadget.svelte
-$effect(() => {
-  if (!browser) return;
-  fetchWeather();
-  const interval = setInterval(fetchWeather, refresh);
-  return () => clearInterval(interval);
-});
-```
-
-**Addon layout patterns:**
-```yaml
-# Resources on left, others on right
-header:
-  - type: resources
-  - type: spacer        # Pushes to right
-  - type: weather
-  - type: search
-  - type: theme-switcher
-
-# All items on right
-header:
-  - type: spacer
-  - type: weather
-  - type: theme-switcher
-
-# Three sections
-header:
-  - type: resources
-  - type: spacer
-  - type: weather
-  - type: spacer
-  - type: theme-switcher
-```
+## File Organization
+- `src/lib/widgets/`: Service-specific widgets.
+- `src/lib/gadgets/`: Header bar components.
+- `src/lib/features/`: Optional heavy functionality.
+- `src/lib/config/`: Loader, schema, cache logic.
+- `src/lib/components/ui/`: shadcn-svelte base components.
+- `src/lib/components/widget-ui/`: Domain-specific UI helpers.
