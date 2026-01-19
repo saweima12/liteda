@@ -47,7 +47,7 @@
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   .widget-progress {
     @apply space-y-1.5;
   }

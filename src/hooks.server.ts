@@ -8,7 +8,7 @@ import { initI18n } from '$lib/i18n';
 import { destroyFeatures, ensureFeatureGroupsRegistered, loadFeatures } from '$lib/features';
 import { updateFeatureConfigs } from '$lib/features/config-store';
 import { buildFeatureConfigs } from '$lib/features/feature-configs';
-import { watch } from 'fs';
+import { watch } from 'node:fs';
 
 let cleanupRegistered = false;
 

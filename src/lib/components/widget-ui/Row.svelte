@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   .widget-row {
     @apply flex items-center justify-between gap-2 text-sm;
   }

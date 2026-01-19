@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   .widget-metric {
     @apply space-y-1;
   }

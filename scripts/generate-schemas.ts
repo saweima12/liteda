@@ -7,8 +7,8 @@
  * Usage: bun run scripts/generate-schemas.ts
  */
 
-import { writeFile, mkdir, readdir } from 'fs/promises';
-import { join } from 'path';
+import { writeFile, mkdir, readdir } from 'node:fs/promises';
+import { join } from 'node:path';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { z, type ZodTypeAny } from 'zod';
 

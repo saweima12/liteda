@@ -26,7 +26,7 @@
   <span class="widget-status-label">{displayLabel}</span>
 </div>
 
-<style>
+<style lang="postcss">
   .widget-status {
     @apply flex items-center gap-2 text-sm;
   }

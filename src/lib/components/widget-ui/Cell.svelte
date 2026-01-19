@@ -16,7 +16,7 @@
   <div class="widget-cell-label">{label}</div>
 </div>
 
-<style>
+<style lang="postcss">
   .widget-cell {
     @apply text-center p-2 rounded-md bg-muted/50;
   }

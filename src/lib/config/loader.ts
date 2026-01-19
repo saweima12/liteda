@@ -1,7 +1,7 @@
-import { readFile } from 'fs/promises';
-import { existsSync } from 'fs';
+import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { parse } from 'yaml';
-import { join } from 'path';
+import { join } from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import {

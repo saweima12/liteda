@@ -34,7 +34,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="postcss">
   .widget-block {
     @apply space-y-2;
   }
