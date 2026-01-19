@@ -3,7 +3,7 @@
  * 
  * Server-side handler for fetching widget data
  */
-import { createHandler } from '../utils/create-handler';
+import { createHandler } from '../utils/create-handler.server';
 import widget from './meta';
 
 export const POST = createHandler({

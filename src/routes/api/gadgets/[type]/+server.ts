@@ -4,7 +4,7 @@ import { hasGadget } from '$lib/gadgets';
 
 // Auto-scan all gadget handlers (exclude _template)
 const handlers = import.meta.glob<{ GET?: RequestHandler; POST?: RequestHandler }>(
-	['$lib/gadgets/*/handler.ts', '!$lib/gadgets/_template/handler.ts'],
+	['$lib/gadgets/*/handler.server.ts', '!$lib/gadgets/_template/handler.server.ts'],
 	{ eager: true }
 );
 
@@ -12,8 +12,8 @@ const handlers = import.meta.glob<{ GET?: RequestHandler; POST?: RequestHandler 
 const handlerMap = new Map<string, { GET?: RequestHandler; POST?: RequestHandler }>();
 
 for (const [path, module] of Object.entries(handlers)) {
-	// Extract gadget name from path: /src/lib/gadgets/weather/handler.ts -> weather
-	const match = path.match(/\/gadgets\/([^/]+)\/handler\.ts$/);
+	
+	const match = path.match(/\/gadgets\/([^/]+)\/handler\.server\.ts$/);
 	if (match) {
 		handlerMap.set(match[1], {
 			GET: module.GET,

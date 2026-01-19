@@ -32,6 +32,7 @@ RUN addgroup -g 1000 liteda && \
 
 # Copy built files from builder
 COPY --from=builder --chown=liteda:liteda /app/build ./build
+COPY --from=builder --chown=liteda:liteda /app/node_modules ./node_modules
 COPY --from=builder --chown=liteda:liteda /app/package.json ./
 
 # Copy example config

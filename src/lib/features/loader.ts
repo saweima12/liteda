@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import type { Feature, FeatureConfig, FeatureMeta } from './types';
-import { FEATURES_REGISTRY } from './registry';
+import { FEATURES_REGISTRY_SERVER } from './registry.server';
 import { registerGroupRenderer, type GroupComponentLoader } from './group-registry';
 
 /** Loaded features (for destroy) */
@@ -49,7 +49,7 @@ export async function loadFeatures(
   console.log(`[Features] Loading ${enabledFeatures.length} feature(s)...`);
 
   for (const [featureName, config] of enabledFeatures) {
-    const registryEntry = FEATURES_REGISTRY[featureName];
+    const registryEntry = FEATURES_REGISTRY_SERVER[featureName];
 
     if (!registryEntry) {
       console.warn(`[Features] Unknown feature: ${featureName}`);

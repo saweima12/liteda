@@ -60,6 +60,9 @@ features:
 
 ## Connection Methods
 
+**Support policy:** This feature talks to the Docker Engine API over a Unix socket or a TCP/HTTPS endpoint.
+SSH-based Docker connections are intentionally not supported.
+
 ### Unix Socket (Default)
 
 ```yaml

@@ -85,44 +85,6 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "const": "theme-switcher"
-                      },
-                      "vars": {
-                        "type": "object",
-                        "properties": {},
-                        "additionalProperties": false,
-                        "description": "Toggle between light and dark theme"
-                      }
-                    },
-                    "required": [
-                      "type"
-                    ],
-                    "additionalProperties": false
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "const": "title"
-                      },
-                      "vars": {
-                        "type": "object",
-                        "properties": {},
-                        "additionalProperties": false,
-                        "description": "Display site title from settings"
-                      }
-                    },
-                    "required": [
-                      "type"
-                    ],
-                    "additionalProperties": false
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
                         "const": "resources"
                       },
                       "vars": {
@@ -229,25 +191,6 @@
                     "properties": {
                       "type": {
                         "type": "string",
-                        "const": "search"
-                      },
-                      "vars": {
-                        "type": "object",
-                        "properties": {},
-                        "additionalProperties": false,
-                        "description": "Global search"
-                      }
-                    },
-                    "required": [
-                      "type"
-                    ],
-                    "additionalProperties": false
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
                         "const": "weather"
                       },
                       "vars": {
@@ -289,6 +232,63 @@
                         ],
                         "additionalProperties": false,
                         "description": "Current weather from Open-Meteo API"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "title"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Display site title from settings"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "theme-switcher"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Toggle between light and dark theme"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "search"
+                      },
+                      "vars": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": false,
+                        "description": "Global search"
                       }
                     },
                     "required": [

@@ -1,4 +1,4 @@
-import { createHandler } from '../utils/create-handler';
+import { createHandler } from '../utils/create-handler.server';
 import widget from './meta';
 
 interface AdGuardStats {

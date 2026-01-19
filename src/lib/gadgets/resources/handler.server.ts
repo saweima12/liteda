@@ -1,4 +1,4 @@
-import { createGadgetHandler } from '$lib/gadgets/utils/create-handler';
+import { createGadgetHandler } from '$lib/gadgets/utils/create-handler.server';
 import { resourcesVarsSchema, type ResourcesData } from './types';
 import si from 'systeminformation';
 

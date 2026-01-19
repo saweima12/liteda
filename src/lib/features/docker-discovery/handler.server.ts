@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { createFeatureHandler } from '../feature-handler';
-import { dockerGroupVarsSchema } from './meta';
-import { getDockerClient } from './docker-client';
+import { createFeatureHandler } from '../feature-handler.server';
+import { dockerGroupVarsSchema } from './meta.shared';
+import { getDockerClient } from './docker-client.server';
 import { mapContainers, filterByLabels } from './utils';
 
 /**
@@ -14,23 +14,18 @@ import { mapContainers, filterByLabels } from './utils';
 export const GET: RequestHandler = createFeatureHandler({
   varsSchema: dockerGroupVarsSchema,
 
-  async fetch(vars, context) {
-    // Extract urlTemplate from group config
-    // SECURITY: vars are validated, urlTemplate is retrieved from server-side config
+  async fetch(vars) {
     const urlTemplate = vars.urlTemplate;
 
-    // Fetch containers from Docker
     const docker = getDockerClient();
     const rawContainers = await docker.listContainers({ all: true });
     const containers = mapContainers(rawContainers);
 
-    // Filter by labels (include/exclude)
     const filtered = filterByLabels(containers, rawContainers, {
       includeLabels: vars.includeLabels,
       excludeLabels: vars.excludeLabels,
     });
 
-    // Map to response format with URL generation
     return {
       containers: filtered.map((container) => ({
         id: container.id,
@@ -38,8 +33,6 @@ export const GET: RequestHandler = createFeatureHandler({
         image: container.image,
         state: container.state,
         status: container.status,
-        // Apply URL template if configured
-        // Supports tokens: {name}, {id}, {image}, {state}
         url: urlTemplate
           ? urlTemplate
               .replace('{name}', container.name)

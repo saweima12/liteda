@@ -8,10 +8,11 @@ A lightweight, memory-efficient dashboard for your homelab. Built with SvelteKit
 
 - 🚀 **Lightweight** - ~50-80MB base memory, ~100MB during active polling
 - ⚡ **Fast** - SvelteKit SSR with smart caching (default 10s TTL)
+- 📱 **PWA Support** - Install as app, offline support, mobile-friendly
 - 📄 **Simple Config** - YAML files + Markdown pages, no database needed
 - ✨ **IDE Support** - JSON schema validation with autocompletion
 - 🎨 **Customizable** - Themes, backgrounds, flexible header layout
-- 📱 **Multi-page** - Organize services into tabbed pages (YAML or Markdown)
+- 📄 **Multi-page** - Organize services into tabbed pages (YAML or Markdown)
 - 🔀 **SSR Proxy** - Server-side API calls, no CORS issues
 - 🧩 **Extensible** - 13+ built-in widgets for popular homelab services
 
@@ -95,6 +96,34 @@ docker compose -f docker-compose.dev.yml up
 ```
 
 This mounts your source code into the container for live reload.
+
+### PWA Installation
+
+Liteda is a Progressive Web App (PWA) that can be installed on any device:
+
+**Desktop (Chrome/Edge/Brave):**
+1. Look for the install icon (⊕) in the address bar
+2. Click "Install" or use `Ctrl/Cmd + Shift + A`
+
+**Mobile (iOS - Safari):**
+1. Tap Share → "Add to Home Screen"
+
+**Mobile (Android - Chrome):**
+1. Tap menu (⋮) → "Add to Home Screen"
+
+**Features:**
+- 📴 Works offline with intelligent caching
+- 📱 Native app-like experience
+- 🔄 Auto-updates when available
+- ⚡ Faster load times
+
+See [docs/PWA.md](docs/PWA.md) for detailed documentation.
+
+**Generate PWA Icons:**
+```bash
+# Requires Inkscape or ImageMagick
+bun run pwa:icons
+```
 
 ### Configuration Hot Reload
 

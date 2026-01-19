@@ -23,18 +23,19 @@ Liteda is a lightweight homelab dashboard built with SvelteKit.
 - **Caution**: Access reactive properties directly (e.g., `widget.data`), do NOT destructure.
 
 ### Widget System (`src/lib/widgets/`)
-- Three-file structure: `meta.ts` (schemas), `handler.ts` (server fetch), `Widget.svelte` (UI).
+- Three-file structure: `meta.ts` (schemas), `handler.server.ts` (server fetch), `Widget.svelte` (UI).
 - Use `createHandler()` for server-side logic and `useWidget()` for client state.
 - Auto-discovered via `registry.ts`.
 
 ### Gadget System (`src/lib/gadgets/`)
 - Header components like `weather`, `resources`, `search`.
 - Use `defineGadget()` in `meta.ts`.
-- Server data via `createGadgetHandler()` in `handler.ts` + `/api/gadgets/[type]`.
+- Server data via `createGadgetHandler()` in `handler.server.ts` + `/api/gadgets/[type]`.
 
 ### Features System (`src/lib/features/`)
 - Lazy-loaded complex logic (e.g., `docker-discovery`).
-- Implement `Feature` interface; manually register in `registry.ts`.
+- Separate metadata files: `meta.client.ts` (groups), `meta.server.ts` (handlers), `meta.shared.ts` (schemas).
+- Implement `Feature` interface in `index.ts`; manually register in `registry.server.ts` and `registry.client.ts`.
 
 ### UI & Icons
 - **Components**: shadcn-svelte in `src/lib/components/ui/`.
@@ -43,5 +44,5 @@ Liteda is a lightweight homelab dashboard built with SvelteKit.
 
 ## Security
 - **Never** expose sensitive `vars` (API keys) to the client.
-- Handlers run server-side and look up config by ID.
+- All handlers (`handler.server.ts`) run server-side and look up config by ID.
 - Use Zod schemas for all external data and configuration.

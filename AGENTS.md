@@ -40,7 +40,7 @@ Widgets are auto-discovered live data components in `src/lib/widgets/[name]/`.
 2. Define schemas in `meta.ts` using `defineWidget()`:
    - `dataSchema`: shape of data returned from handler
    - `varsSchema`: server-side config (API keys, secrets) - optional
-3. Implement `handler.ts` using `createHandler()`:
+3. Implement `handler.server.ts` using `createHandler()`:
    ```ts
    export const POST = createHandler({
      varsSchema: widget.varsSchema,
@@ -65,16 +65,24 @@ Gadgets are header bar components in `src/lib/gadgets/[name]/`.
 1. Create folder: `src/lib/gadgets/my-gadget/`
 2. Define `meta.ts` with `defineGadget()`.
 3. Create `Gadget.svelte` with UI.
-4. (Optional) Use `createGadgetHandler()` in `handler.ts` if server-side data is needed.
+4. (Optional) Use `createGadgetHandler()` in `handler.server.ts` if server-side data is needed.
 5. Auto-discovered via Vite glob in `src/lib/gadgets/registry.ts`.
 
 ### Features System Patterns
 Features are lazy-loaded, complex extensions in `src/lib/features/[name]/`.
 
-1. **`meta.ts`**: Metadata, schemas, and lazy loaders.
-2. **`index.ts`**: Implementation of `Feature` interface (`init`, `destroy`).
-3. **Manual Registration**: Add to `src/lib/features/registry.ts`.
-4. **Lazy Loading**: Only imported if enabled in `settings.yaml`.
+**File Structure:**
+- **`meta.ts`**: Re-exports combined metadata (client + server).
+- **`meta.client.ts`**: Client-side metadata (groups, component loaders).
+- **`meta.server.ts`**: Server-side metadata (handlers, server-only configs).
+- **`meta.shared.ts`**: Shared schemas (varsSchema, types used by both client and server).
+- **`handler.server.ts`**: Server-side handler implementation for groups.
+- **`index.ts`**: Implementation of `Feature` interface (`init`, `destroy`).
+
+**Manual Registration:**
+1. Add to `src/lib/features/registry.server.ts` (server-side feature entry and handler).
+2. Add to `src/lib/features/registry.client.ts` (client-side metadata entry).
+3. Feature only loads if enabled in `settings.yaml`.
 
 ### UI & Icons
 - **shadcn-svelte**: Use the CLI to add components: `bun x shadcn-svelte@latest add <component>`.
@@ -87,7 +95,7 @@ Features are lazy-loaded, complex extensions in `src/lib/features/[name]/`.
 
 ## Security
 - **Never** expose `vars` (API keys, secrets) to client.
-- Widget/Gadget handlers run server-side via `createHandler()` / `createGadgetHandler()`.
+- Widget/Gadget/Feature handlers run server-side via `createHandler()` / `createGadgetHandler()` / `handler.server.ts`.
 - Use `@ts-expect-error` for Bun-specific TLS options in fetch if needed.
 
 ## File Organization

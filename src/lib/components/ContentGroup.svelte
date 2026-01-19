@@ -4,7 +4,7 @@
   import CompactCard from './CompactCard.svelte';
   import IconExternalLink from '~icons/lucide/external-link';
   import { getGroupRenderer, hasCustomRenderer } from '$lib/features/group-registry';
-  import { ensureFeatureGroupsRegistered } from '$lib/features/registry';
+  import { ensureFeatureGroupsRegistered } from '$lib/features/registry.client';
   import { createFeatureGroupId } from '$lib/features/group-id';
 
   interface Props {

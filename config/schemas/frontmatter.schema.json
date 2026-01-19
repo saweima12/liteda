@@ -69,7 +69,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "const": "demo"
+                              "const": "jellyfin"
                             },
                             "interval": {
                               "type": "number",
@@ -78,20 +78,105 @@
                             "vars": {
                               "type": "object",
                               "properties": {
-                                "apiKey": {
-                                  "type": "string"
-                                },
-                                "endpoint": {
+                                "url": {
                                   "type": "string",
                                   "format": "uri"
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "showStreams": {
+                                  "type": "boolean",
+                                  "default": false
                                 }
                               },
+                              "required": [
+                                "url",
+                                "key"
+                              ],
                               "additionalProperties": false,
-                              "description": "Demo widget showing mock data with polling"
+                              "description": "Jellyfin media server statistics"
                             }
                           },
                           "required": [
-                            "type"
+                            "type",
+                            "vars"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "portainer"
+                            },
+                            "interval": {
+                              "type": "number",
+                              "description": "Polling interval in milliseconds"
+                            },
+                            "vars": {
+                              "type": "object",
+                              "properties": {
+                                "url": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "env": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "url",
+                                "key",
+                                "env"
+                              ],
+                              "additionalProperties": false,
+                              "description": "Portainer container status"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "vars"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "sonarr"
+                            },
+                            "interval": {
+                              "type": "number",
+                              "description": "Polling interval in milliseconds"
+                            },
+                            "vars": {
+                              "type": "object",
+                              "properties": {
+                                "url": {
+                                  "type": "string",
+                                  "format": "uri"
+                                },
+                                "key": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "url",
+                                "key"
+                              ],
+                              "additionalProperties": false,
+                              "description": "Sonarr TV show management"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "vars"
                           ],
                           "additionalProperties": false
                         },
@@ -136,7 +221,38 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "const": "jellyfin"
+                              "const": "demo"
+                            },
+                            "interval": {
+                              "type": "number",
+                              "description": "Polling interval in milliseconds"
+                            },
+                            "vars": {
+                              "type": "object",
+                              "properties": {
+                                "apiKey": {
+                                  "type": "string"
+                                },
+                                "endpoint": {
+                                  "type": "string",
+                                  "format": "uri"
+                                }
+                              },
+                              "additionalProperties": false,
+                              "description": "Demo widget showing mock data with polling"
+                            }
+                          },
+                          "required": [
+                            "type"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "qbittorrent"
                             },
                             "interval": {
                               "type": "number",
@@ -149,20 +265,18 @@
                                   "type": "string",
                                   "format": "uri"
                                 },
-                                "key": {
+                                "username": {
                                   "type": "string"
                                 },
-                                "showStreams": {
-                                  "type": "boolean",
-                                  "default": false
+                                "password": {
+                                  "type": "string"
                                 }
                               },
                               "required": [
-                                "url",
-                                "key"
+                                "url"
                               ],
                               "additionalProperties": false,
-                              "description": "Jellyfin media server statistics"
+                              "description": "qBittorrent download client"
                             }
                           },
                           "required": [
@@ -216,7 +330,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "const": "qbittorrent"
+                              "const": "cloudflared"
                             },
                             "interval": {
                               "type": "number",
@@ -225,22 +339,23 @@
                             "vars": {
                               "type": "object",
                               "properties": {
-                                "url": {
-                                  "type": "string",
-                                  "format": "uri"
-                                },
-                                "username": {
+                                "accountId": {
                                   "type": "string"
                                 },
-                                "password": {
+                                "tunnelId": {
+                                  "type": "string"
+                                },
+                                "key": {
                                   "type": "string"
                                 }
                               },
                               "required": [
-                                "url"
+                                "accountId",
+                                "tunnelId",
+                                "key"
                               ],
                               "additionalProperties": false,
-                              "description": "qBittorrent download client"
+                              "description": "Cloudflare Tunnel status"
                             }
                           },
                           "required": [
@@ -254,7 +369,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "const": "proxmox"
+                              "const": "nginx-proxy-manager"
                             },
                             "interval": {
                               "type": "number",
@@ -271,9 +386,6 @@
                                   "type": "string"
                                 },
                                 "password": {
-                                  "type": "string"
-                                },
-                                "node": {
                                   "type": "string"
                                 }
                               },
@@ -283,7 +395,7 @@
                                 "password"
                               ],
                               "additionalProperties": false,
-                              "description": "Proxmox VE cluster status"
+                              "description": "Nginx Proxy Manager proxy hosts"
                             }
                           },
                           "required": [
@@ -297,7 +409,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "const": "portainer"
+                              "const": "plex"
                             },
                             "interval": {
                               "type": "number",
@@ -310,20 +422,16 @@
                                   "type": "string",
                                   "format": "uri"
                                 },
-                                "key": {
+                                "token": {
                                   "type": "string"
-                                },
-                                "env": {
-                                  "type": "number"
                                 }
                               },
                               "required": [
                                 "url",
-                                "key",
-                                "env"
+                                "token"
                               ],
                               "additionalProperties": false,
-                              "description": "Portainer container status"
+                              "description": "Plex media server statistics"
                             }
                           },
                           "required": [
@@ -411,7 +519,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "const": "nginx-proxy-manager"
+                              "const": "proxmox"
                             },
                             "interval": {
                               "type": "number",
@@ -429,6 +537,9 @@
                                 },
                                 "password": {
                                   "type": "string"
+                                },
+                                "node": {
+                                  "type": "string"
                                 }
                               },
                               "required": [
@@ -437,118 +548,7 @@
                                 "password"
                               ],
                               "additionalProperties": false,
-                              "description": "Nginx Proxy Manager proxy hosts"
-                            }
-                          },
-                          "required": [
-                            "type",
-                            "vars"
-                          ],
-                          "additionalProperties": false
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "const": "cloudflared"
-                            },
-                            "interval": {
-                              "type": "number",
-                              "description": "Polling interval in milliseconds"
-                            },
-                            "vars": {
-                              "type": "object",
-                              "properties": {
-                                "accountId": {
-                                  "type": "string"
-                                },
-                                "tunnelId": {
-                                  "type": "string"
-                                },
-                                "key": {
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                                "accountId",
-                                "tunnelId",
-                                "key"
-                              ],
-                              "additionalProperties": false,
-                              "description": "Cloudflare Tunnel status"
-                            }
-                          },
-                          "required": [
-                            "type",
-                            "vars"
-                          ],
-                          "additionalProperties": false
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "const": "plex"
-                            },
-                            "interval": {
-                              "type": "number",
-                              "description": "Polling interval in milliseconds"
-                            },
-                            "vars": {
-                              "type": "object",
-                              "properties": {
-                                "url": {
-                                  "type": "string",
-                                  "format": "uri"
-                                },
-                                "token": {
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                                "url",
-                                "token"
-                              ],
-                              "additionalProperties": false,
-                              "description": "Plex media server statistics"
-                            }
-                          },
-                          "required": [
-                            "type",
-                            "vars"
-                          ],
-                          "additionalProperties": false
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "const": "sonarr"
-                            },
-                            "interval": {
-                              "type": "number",
-                              "description": "Polling interval in milliseconds"
-                            },
-                            "vars": {
-                              "type": "object",
-                              "properties": {
-                                "url": {
-                                  "type": "string",
-                                  "format": "uri"
-                                },
-                                "key": {
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                                "url",
-                                "key"
-                              ],
-                              "additionalProperties": false,
-                              "description": "Sonarr TV show management"
+                              "description": "Proxmox VE cluster status"
                             }
                           },
                           "required": [

@@ -1,4 +1,4 @@
-import { createGadgetHandler } from '$lib/gadgets/utils/create-handler';
+import { createGadgetHandler } from '$lib/gadgets/utils/create-handler.server';
 import { weatherVarsSchema, type WeatherData, type OpenMeteoResponse } from './types';
 
 /**

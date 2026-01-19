@@ -4,7 +4,7 @@ import { hasWidget } from '$lib/widgets';
 
 // Auto-scan all widget handlers (exclude _template)
 const handlers = import.meta.glob<{ POST: RequestHandler }>(
-  ['$lib/widgets/*/handler.ts', '!$lib/widgets/_template/handler.ts'],
+  ['$lib/widgets/*/handler.server.ts', '!$lib/widgets/_template/handler.server.ts'],
   { eager: true }
 );
 
@@ -12,8 +12,8 @@ const handlers = import.meta.glob<{ POST: RequestHandler }>(
 const handlerMap = new Map<string, RequestHandler>();
 
 for (const [path, module] of Object.entries(handlers)) {
-  // Extract widget name from path: /src/lib/widgets/demo/handler.ts -> demo
-  const match = path.match(/\/widgets\/([^/]+)\/handler\.ts$/);
+  
+  const match = path.match(/\/widgets\/([^/]+)\/handler\.server\.ts$/);
   if (match && module.POST) {
     handlerMap.set(match[1], module.POST);
   }

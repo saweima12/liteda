@@ -1,6 +1,6 @@
 import type { Feature } from '../types';
-import { varsSchema } from './meta';
-import { closeDockerClient, initDockerClient } from './docker-client';
+import { varsSchema } from './meta.shared';
+import { closeDockerClient, initDockerClient } from './docker-client.server';
 
 const dockerDiscovery: Feature = {
   name: 'docker-discovery',
