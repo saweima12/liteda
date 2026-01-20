@@ -6,6 +6,7 @@
   import { getGroupRenderer, hasCustomRenderer } from '$lib/features/group-registry';
   import { ensureFeatureGroupsRegistered } from '$lib/features/registry.client';
   import { createFeatureGroupId } from '$lib/features/group-id';
+  import { getIconUrl } from '$lib/utils/icons';
 
   interface Props {
     group: ServiceGroupType;
@@ -76,13 +77,6 @@
     5: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5',
     6: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6',
   };
-
-  function getIconUrl(icon: string | undefined): string | null {
-    if (!icon) return null;
-    if (icon.startsWith('http://') || icon.startsWith('https://')) return icon;
-    if (icon.startsWith('/')) return icon;
-    return `https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/${icon}.png`;
-  }
 
   function isInnerBookmarks(inner: InnerGroup): boolean {
     return inner.type === 'bookmarks';

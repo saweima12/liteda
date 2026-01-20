@@ -1,23 +1,19 @@
 <script lang="ts">
   import type { ServiceItem } from '$config';
   import type { ClientWidgetConfig, ServiceStatus } from '$lib/widgets/types';
-  import { Card } from './ui';
+  import { browser } from '$app/environment';
+  import { Card, Skeleton } from './ui';
   import WidgetContainer from './WidgetContainer.svelte';
   import StatusIndicator from './StatusIndicator.svelte';
   import IconExternalLink from '~icons/lucide/external-link';
+  import IconLink from '~icons/lucide/link';
+  import { getIconUrl } from '$lib/utils/icons';
 
   interface Props {
     service: ServiceItem;
     widgetId?: string;
     statusCheckId?: string;
     equalHeight?: boolean;
-  }
-
-  function getIconUrl(icon: string | undefined): string | null {
-    if (!icon) return null;
-    if (icon.startsWith('http://') || icon.startsWith('https://')) return icon;
-    if (icon.startsWith('/')) return icon;
-    return `https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/${icon}.png`;
   }
 
   let { service, widgetId, statusCheckId, equalHeight = true }: Props = $props();
@@ -49,6 +45,19 @@
   // Determine if we should show status indicator
   // Show if: has widget OR has statusCheck
   const showStatus = $derived(!!clientWidgetConfig || hasStatusCheck);
+
+  // Check if service has links
+  const hasLinks = $derived(!!(service.links && service.links.length > 0));
+
+  // Track if links section is hydrated to prevent layout shift
+  let linksHydrated = $state(false);
+
+  // Hydrate links on client to prevent layout shift during SSR
+  $effect(() => {
+    if (browser && hasLinks) {
+      linksHydrated = true;
+    }
+  });
 </script>
 
 {#snippet cardContent()}
@@ -105,6 +114,54 @@
       {#if clientWidgetConfig}
         <div class="mt-3 pt-3 border-t border-border">
           <WidgetContainer config={clientWidgetConfig} onStatus={handleWidgetStatus} />
+        </div>
+      {/if}
+
+      <!-- Sub-links with skeleton loading transition -->
+      {#if hasLinks}
+        <div class="mt-3 pt-3 border-t border-border">
+          {#if !linksHydrated}
+            <!-- Skeleton placeholder to reserve space during SSR/hydration -->
+            <div class="flex flex-wrap gap-2">
+              {#each service.links as _}
+                <Skeleton class="h-8 w-20 rounded-md" />
+              {/each}
+            </div>
+          {:else}
+            <!-- Actual links -->
+            <div class="flex flex-wrap gap-2">
+              {#each service.links as link}
+                <a
+                  href={link.url}
+                  target={link.target}
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  onclick={(e) => e.stopPropagation()}
+                >
+                  <span class="inline-flex items-center justify-center w-3 h-3 flex-shrink-0">
+                    {#if link.icon}
+                      <img
+                        src={getIconUrl(link.icon)}
+                        alt=""
+                        class="w-full h-full object-contain"
+                        onerror={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.style.display = 'none';
+                          const parent = img.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+                          }
+                        }}
+                      />
+                    {:else}
+                      <IconLink class="w-3 h-3" />
+                    {/if}
+                  </span>
+                  <span>{link.name}</span>
+                </a>
+              {/each}
+            </div>
+          {/if}
         </div>
       {/if}
     </div>

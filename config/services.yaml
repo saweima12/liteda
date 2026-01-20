@@ -25,10 +25,27 @@
           icon: portainer
           url: https://portainer.local
           description: Container management
+          links:
+            - name: Containers
+              url: https://portainer.local/#!/2/docker/containers
+            - name: Images
+              url: https://portainer.local/#!/2/docker/images
+            - name: Networks
+              url: https://portainer.local/#!/2/docker/networks
+            - name: Volumes
+              url: https://portainer.local/#!/2/docker/volumes
         - name: Proxmox
           icon: proxmox
           url: https://pve.local
           description: Virtualization platform
+          links:
+            - name: Node 1
+              url: https://pve.local:8006/#v1:0:=node/pve1
+            - name: Node 2
+              url: https://pve.local:8006/#v1:0:=node/pve2
+            - name: Backups
+              url: https://pve.local:8006/#v1:0:=storage/local/content
+              icon: database
 
 # Example: Flat group with items
 - name: Quick Access

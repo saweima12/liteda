@@ -2,16 +2,10 @@
   import type { ServiceItem } from '$config';
   import { Card } from './ui';
   import IconExternalLink from '~icons/lucide/external-link';
+  import { getIconUrl } from '$lib/utils/icons';
 
   interface Props {
     item: ServiceItem;
-  }
-
-  function getIconUrl(icon: string | undefined): string | null {
-    if (!icon) return null;
-    if (icon.startsWith('http://') || icon.startsWith('https://')) return icon;
-    if (icon.startsWith('/')) return icon;
-    return `https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/${icon}.png`;
   }
 
   let { item }: Props = $props();

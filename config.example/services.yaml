@@ -10,6 +10,16 @@
       icon: portainer
       url: https://portainer.local
       description: Container management
+      # Example: Multiple functional areas
+      links:
+        - name: Containers
+          url: https://portainer.local/#!/2/docker/containers
+        - name: Images
+          url: https://portainer.local/#!/2/docker/images
+        - name: Networks
+          url: https://portainer.local/#!/2/docker/networks
+        - name: Volumes
+          url: https://portainer.local/#!/2/docker/volumes
       # Uncomment to add live widget
       # widget:
       #   type: portainer
@@ -23,6 +33,15 @@
       icon: proxmox
       url: https://pve.local
       description: Virtualization platform
+      # Example: Multiple sub-links for quick access
+      links:
+        - name: Node 1
+          url: https://pve.local:8006/#v1:0:=node/pve1
+        - name: Node 2
+          url: https://pve.local:8006/#v1:0:=node/pve2
+        - name: Backups
+          url: https://pve.local:8006/#v1:0:=storage/local/content
+          icon: database
 
     - name: Grafana
       icon: grafana
@@ -33,6 +52,17 @@
       icon: jellyfin
       url: https://jellyfin.local
       description: Media server
+      # Example: Links with custom icons
+      links:
+        - name: Movies
+          url: https://jellyfin.local/web/index.html#!/movies.html
+          icon: film
+        - name: TV Shows
+          url: https://jellyfin.local/web/index.html#!/tv.html
+          icon: tv
+        - name: Music
+          url: https://jellyfin.local/web/index.html#!/music.html
+          icon: music
 
 # Example: Nested groups
 - name: Infrastructure

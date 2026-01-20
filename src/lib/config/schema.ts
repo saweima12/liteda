@@ -30,6 +30,12 @@ export const serviceItemSchema = z.object({
   url: z.string().url().optional(),
   description: z.string().optional(),
   target: z.enum(['_blank', '_self']).optional().default('_blank'),
+  links: z.array(z.object({
+    name: z.string(),
+    url: z.string().url(),
+    icon: z.string().optional(),
+    target: z.enum(['_blank', '_self']).optional().default('_blank'),
+  })).optional(),
   widget: widgetConfigSchema.optional(),
   statuscheck: statusCheckConfigSchema.optional(),
 });
