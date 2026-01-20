@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Skeleton } from '$components/ui';
+
   type Variant = 'default' | 'success' | 'warning' | 'danger';
 
   interface Props {
@@ -7,9 +9,10 @@
     label?: string;
     showValue?: boolean;
     variant?: Variant;
+    loading?: boolean;
   }
 
-  let { value, max = 100, label, showValue = true, variant = 'default' }: Props = $props();
+  let { value, max = 100, label, showValue = true, variant = 'default', loading = false }: Props = $props();
 
   const percentage = $derived(Math.min(100, Math.max(0, (value / max) * 100)));
 
@@ -31,21 +34,33 @@
   const barClass = $derived(variantClasses[autoVariant]);
 </script>
 
-<div class="widget-progress">
-  {#if label || showValue}
-    <div class="widget-progress-header">
-      {#if label}
-        <span class="widget-progress-label">{label}</span>
-      {/if}
-      {#if showValue}
-        <span class="widget-progress-value">{percentage.toFixed(0)}%</span>
-      {/if}
-    </div>
-  {/if}
-  <div class="widget-progress-track">
-    <div class="widget-progress-bar {barClass}" style="width: {percentage}%"></div>
+{#if loading}
+  <div class="widget-progress">
+    {#if label || showValue}
+      <div class="widget-progress-header">
+        <Skeleton class="h-4 w-20" />
+        <Skeleton class="h-4 w-8" />
+      </div>
+    {/if}
+    <Skeleton class="h-2 w-full rounded-full" />
   </div>
-</div>
+{:else}
+  <div class="widget-progress">
+    {#if label || showValue}
+      <div class="widget-progress-header">
+        {#if label}
+          <span class="widget-progress-label">{label}</span>
+        {/if}
+        {#if showValue}
+          <span class="widget-progress-value">{percentage.toFixed(0)}%</span>
+        {/if}
+      </div>
+    {/if}
+    <div class="widget-progress-track">
+      <div class="widget-progress-bar {barClass}" style="width: {percentage}%"></div>
+    </div>
+  </div>
+{/if}
 
 <style lang="postcss">
   .widget-progress {

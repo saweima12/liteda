@@ -1,14 +1,16 @@
 <script lang="ts">
   import { t } from '$lib/i18n';
+  import { Skeleton } from '$components/ui';
 
   type StatusType = 'healthy' | 'warning' | 'error' | 'unknown';
 
   interface Props {
     status: StatusType;
     label?: string;
+    loading?: boolean;
   }
 
-  let { status, label }: Props = $props();
+  let { status, label, loading = false }: Props = $props();
 
   const statusConfig: Record<StatusType, { color: string; i18nKey: string }> = {
     healthy: { color: 'bg-success', i18nKey: 'common.status.healthy' },
@@ -21,10 +23,17 @@
   const displayLabel = $derived(label ?? $t(config.i18nKey));
 </script>
 
-<div class="widget-status">
-  <span class="widget-status-dot {config.color}"></span>
-  <span class="widget-status-label">{displayLabel}</span>
-</div>
+{#if loading}
+  <div class="widget-status">
+    <Skeleton class="h-2 w-2 rounded-full" />
+    <Skeleton class="h-4 w-16" />
+  </div>
+{:else}
+  <div class="widget-status">
+    <span class="widget-status-dot {config.color}"></span>
+    <span class="widget-status-label">{displayLabel}</span>
+  </div>
+{/if}
 
 <style lang="postcss">
   .widget-status {

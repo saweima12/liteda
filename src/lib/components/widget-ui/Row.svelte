@@ -1,27 +1,36 @@
 <script lang="ts">
   import type { Component } from 'svelte';
+  import { Skeleton } from '$components/ui';
 
   interface Props {
     label: string;
     value: string | number;
     icon?: Component;
     hint?: string;
+    loading?: boolean;
   }
 
-  let { label, value, icon: Icon, hint }: Props = $props();
+  let { label, value, icon: Icon, hint, loading = false }: Props = $props();
 </script>
 
-<div class="widget-row">
-  <div class="widget-row-label">
-    {#if Icon}
-      <Icon class="widget-row-icon" />
-    {/if}
-    <span>{label}</span>
+{#if loading}
+  <div class="widget-row">
+    <Skeleton class="h-4 w-24" />
+    <Skeleton class="h-4 w-16" />
   </div>
-  <div class="widget-row-value" title={hint}>
-    {value}
+{:else}
+  <div class="widget-row">
+    <div class="widget-row-label">
+      {#if Icon}
+        <Icon class="widget-row-icon" />
+      {/if}
+      <span>{label}</span>
+    </div>
+    <div class="widget-row-value" title={hint}>
+      {value}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="postcss">
   .widget-row {

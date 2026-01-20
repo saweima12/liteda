@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Component } from 'svelte';
+  import { Skeleton } from '$components/ui';
   import IconTrendingUp from '~icons/lucide/trending-up';
   import IconTrendingDown from '~icons/lucide/trending-down';
   import IconMinus from '~icons/lucide/minus';
@@ -13,9 +14,10 @@
     icon?: Component;
     trend?: Trend;
     trendValue?: string;
+    loading?: boolean;
   }
 
-  let { label, value, unit, icon: Icon, trend, trendValue }: Props = $props();
+  let { label, value, unit, icon: Icon, trend, trendValue, loading = false }: Props = $props();
 
   const trendConfig: Record<Trend, { icon: Component; class: string }> = {
     up: { icon: IconTrendingUp, class: 'text-success' },
@@ -26,28 +28,35 @@
   const trendInfo = $derived(trend ? trendConfig[trend] : null);
 </script>
 
-<div class="widget-metric">
-  <div class="widget-metric-header">
-    {#if Icon}
-      <Icon class="widget-metric-icon" />
-    {/if}
-    <span class="widget-metric-label">{label}</span>
+{#if loading}
+  <div class="widget-metric">
+    <Skeleton class="h-4 w-20" />
+    <Skeleton class="h-8 w-24" />
   </div>
-  <div class="widget-metric-body">
-    <span class="widget-metric-value">
-      {value}{#if unit}<span class="widget-metric-unit">{unit}</span>{/if}
-    </span>
-    {#if trendInfo}
-      {@const TrendIcon = trendInfo.icon}
-      <span class="widget-metric-trend {trendInfo.class}">
-        <TrendIcon class="h-3.5 w-3.5" />
-        {#if trendValue}
-          <span class="text-xs">{trendValue}</span>
-        {/if}
+{:else}
+  <div class="widget-metric">
+    <div class="widget-metric-header">
+      {#if Icon}
+        <Icon class="widget-metric-icon" />
+      {/if}
+      <span class="widget-metric-label">{label}</span>
+    </div>
+    <div class="widget-metric-body">
+      <span class="widget-metric-value">
+        {value}{#if unit}<span class="widget-metric-unit">{unit}</span>{/if}
       </span>
-    {/if}
+      {#if trendInfo}
+        {@const TrendIcon = trendInfo.icon}
+        <span class="widget-metric-trend {trendInfo.class}">
+          <TrendIcon class="h-3.5 w-3.5" />
+          {#if trendValue}
+            <span class="text-xs">{trendValue}</span>
+          {/if}
+        </span>
+      {/if}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="postcss">
   .widget-metric {
