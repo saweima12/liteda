@@ -9,7 +9,6 @@
   import { useWidget } from '../utils';
   import { wt } from '../utils/i18n';
   import { Block, Row, Cell, Status, Metric, Progress } from '$components/widget-ui';
-  import { Skeleton } from '$components/ui';
   import IconAlertCircle from '~icons/lucide/alert-circle';
 
   interface Props {
@@ -25,14 +24,8 @@
   const tw = wt(widgetDef.name);
 </script>
 
-<Block>
-  {#if widget.loading && !widget.data}
-    <!-- Loading state -->
-    <div class="space-y-2">
-      <Skeleton class="h-4 w-24" />
-      <Skeleton class="h-4 w-32" />
-    </div>
-  {:else if widget.error}
+<Block loading={widget.loading && !widget.data}>
+  {#if widget.error}
     <!-- Error state -->
     <div class="flex items-center gap-2 text-destructive text-sm">
       <IconAlertCircle class="h-4 w-4" />
@@ -42,21 +35,21 @@
     <!-- Normal state - use widget-ui components to render data -->
     
     <!-- Example: use Row for key-value display -->
-    <!-- <Row label="Status" value={widget.data.status} /> -->
+    <!-- <Row label="Status" value={widget.data.status} loading={widget.loading} /> -->
     
     <!-- Example: use Status for status indicator -->
-    <!-- <Status status={widget.data.status === 'online' ? 'healthy' : 'error'} /> -->
+    <!-- <Status status={widget.data.status === 'online' ? 'healthy' : 'error'} loading={widget.loading} /> -->
     
     <!-- Example: use Metric for large numbers -->
-    <!-- <Metric label="Value" value={widget.data.value} unit="%" /> -->
+    <!-- <Metric label="Value" value={widget.data.value} unit="%" loading={widget.loading} /> -->
     
     <!-- Example: use Progress for progress bar -->
-    <!-- <Progress label="Usage" value={widget.data.value} max={100} /> -->
+    <!-- <Progress label="Usage" value={widget.data.value} max={100} loading={widget.loading} /> -->
     
     <!-- Example: use Grid layout with i18n -->
-    <!-- <Block layout="grid" columns={2}>
-      <Cell label={$tw('labels.label1')}>{widget.data.value1}</Cell>
-      <Cell label={$tw('labels.label2')}>{widget.data.value2}</Cell>
+    <!-- <Block layout="grid" columns={2} loading={widget.loading}>
+      <Cell label={$tw('labels.label1')} loading={widget.loading}>{widget.data.value1}</Cell>
+      <Cell label={$tw('labels.label2')} loading={widget.loading}>{widget.data.value2}</Cell>
     </Block> -->
 
     <!-- Remember to add translations to:

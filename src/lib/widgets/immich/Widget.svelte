@@ -21,16 +21,10 @@
 		</div>
 	{:else if widget.data}
 		<div class="grid grid-cols-4 gap-2">
-			<Cell label="Dashboards">{widget.data.dashboards}</Cell>
-			<Cell label="Sources">{widget.data.datasources}</Cell>
-			<Cell label="Alerts">{widget.data.alerts}</Cell>
-			<Cell label="Triggered">
-				{#if widget.data.alertsTriggered > 0}
-					<span class="text-yellow-500">{widget.data.alertsTriggered}</span>
-				{:else}
-					{widget.data.alertsTriggered}
-				{/if}
-			</Cell>
+			<Cell label="Photos">{widget.data.photos}</Cell>
+			<Cell label="Videos">{widget.data.videos}</Cell>
+			<Cell label="Storage">{widget.data.totalSize}</Cell>
+			<Cell label="Users">{widget.data.users}</Cell>
 		</div>
 	{/if}
 </Block>

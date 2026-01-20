@@ -4,7 +4,6 @@
   import { useWidget } from '../utils';
   import { wt } from '../utils/i18n';
   import { Block, Cell } from '$components/widget-ui';
-  import { Skeleton } from '$components/ui';
   import IconAlertCircle from '~icons/lucide/alert-circle';
 
   interface Props {
@@ -17,12 +16,8 @@
   const tw = wt(widgetDef.name);
 </script>
 
-<Block>
-  {#if widget.loading && !widget.data}
-    <div class="space-y-2">
-      <Skeleton class="h-4 w-20" />
-    </div>
-  {:else if widget.error}
+<Block loading={widget.loading && !widget.data}>
+  {#if widget.error}
     <div class="flex items-center gap-2 text-destructive text-sm">
       <IconAlertCircle class="h-4 w-4" />
       <span>{widget.error}</span>

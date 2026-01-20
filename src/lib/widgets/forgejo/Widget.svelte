@@ -21,14 +21,14 @@
 		</div>
 	{:else if widget.data}
 		<div class="grid grid-cols-4 gap-2">
-			<Cell label="Dashboards">{widget.data.dashboards}</Cell>
-			<Cell label="Sources">{widget.data.datasources}</Cell>
-			<Cell label="Alerts">{widget.data.alerts}</Cell>
-			<Cell label="Triggered">
-				{#if widget.data.alertsTriggered > 0}
-					<span class="text-yellow-500">{widget.data.alertsTriggered}</span>
+			<Cell label="Repositories">{widget.data.repositories}</Cell>
+			<Cell label="Stars">{widget.data.stars}</Cell>
+			<Cell label="Forks">{widget.data.forks}</Cell>
+			<Cell label="Issues">
+				{#if widget.data.issues > 0}
+					<span class="text-yellow-500">{widget.data.issues}</span>
 				{:else}
-					{widget.data.alertsTriggered}
+					{widget.data.issues}
 				{/if}
 			</Cell>
 		</div>
