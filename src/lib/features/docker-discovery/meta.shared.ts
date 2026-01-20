@@ -21,6 +21,8 @@ export const dockerGroupVarsSchema = z.object({
   includeLabels: z.array(z.string()).optional(),
   excludeLabels: z.array(z.string()).optional(),
   urlTemplate: z.string().optional(),
+  mode: z.enum(['auto', 'container', 'swarm']).default('auto'),
+  enableEventStream: z.boolean().default(false),
 });
 
 export type DockerGroupVars = z.infer<typeof dockerGroupVarsSchema>;

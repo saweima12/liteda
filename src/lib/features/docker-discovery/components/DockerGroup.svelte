@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import type { DockerContainer } from '../types';
+  import type { DockerContainer, DockerServiceInfo, DockerDiscoveryMode } from '../types';
   import ServiceCard from '$lib/components/ServiceCard.svelte';
   import type { ServiceItem } from '$config';
 
@@ -11,6 +11,8 @@
       urlTemplate?: string;
       includeLabels?: string[];
       excludeLabels?: string[];
+      mode?: 'auto' | 'container' | 'swarm';
+      enableEventStream?: boolean;
     };
     group: { name: string; icon?: string };
     groupId: string;
@@ -20,15 +22,16 @@
   let { config, group, groupId, showName = true }: Props = $props();
 
   // State management (similar to widget pattern)
-  let containers = $state<DockerContainer[]>([]);
+  let items = $state<(DockerContainer | DockerServiceInfo)[]>([]);
+  let mode = $state<DockerDiscoveryMode>('container');
   let loading = $state(true);
   let error = $state<string | null>(null);
 
   /**
-   * Fetch containers from API
+   * Fetch containers or services from API
    * Only passes groupId - server looks up full config with sensitive vars
    */
-  async function fetchContainers() {
+  async function fetchItems() {
     if (!browser) return;
 
     try {
@@ -43,10 +46,11 @@
       }
 
       const data = await response.json();
-      containers = data.data?.containers ?? [];
+      mode = data.data?.mode ?? 'container';
+      items = data.data?.items ?? [];
       error = null;
     } catch (err) {
-      error = err instanceof Error ? err.message : 'Failed to fetch containers';
+      error = err instanceof Error ? err.message : 'Failed to fetch items';
       console.error('[DockerGroup] Fetch error:', err);
     } finally {
       loading = false;
@@ -54,35 +58,33 @@
   }
 
   /**
-   * Resolve URL for container using template
-   * Server also applies this, but we keep it for consistency
-   * NOTE: Server-provided URLs take precedence
+   * Check if item is a service (has replicas property)
    */
-  function resolveUrl(container: DockerContainer): string | undefined {
-    // Use server-provided URL if available
-    if (container.url) return container.url;
-
-    // Fallback: client-side URL resolution (for backwards compatibility)
-    if (!config.urlTemplate) return undefined;
-
-    return config.urlTemplate
-      .replace('{name}', container.name)
-      .replace('{id}', container.id)
-      .replace('{image}', container.image)
-      .replace('{state}', container.state);
+  function isService(item: DockerContainer | DockerServiceInfo): item is DockerServiceInfo {
+    return 'replicas' in item;
   }
 
   /**
-   * Transform containers to ServiceItem format
+   * Generate description for item
+   */
+  function getDescription(item: DockerContainer | DockerServiceInfo): string {
+    if (isService(item)) {
+      return `${item.image} • ${item.replicas.running}/${item.replicas.desired} replicas`;
+    }
+    return `${item.image} • ${item.status}`;
+  }
+
+  /**
+   * Transform items to ServiceItem format
    * ServiceCard will handle URL clicking with target="_blank"
    */
-  const items = $derived.by((): ServiceItem[] =>
-    containers.map(
-      (container): ServiceItem => ({
-        name: container.name,
+  const serviceItems = $derived.by((): ServiceItem[] =>
+    items.map(
+      (item): ServiceItem => ({
+        name: item.name,
         icon: group.icon,
-        description: `${container.image} • ${container.status}`,
-        url: resolveUrl(container),
+        description: getDescription(item),
+        url: item.url,
         target: '_blank',
       })
     )
@@ -106,9 +108,9 @@
   $effect(() => {
     if (!browser) return;
 
-    fetchContainers();
+    fetchItems();
     const interval = setInterval(
-      fetchContainers,
+      fetchItems,
       config.refreshInterval ?? 30000
     );
 
@@ -121,23 +123,26 @@
     <div class="flex items-center justify-between">
       <h2 class="text-xl font-bold text-foreground flex items-center gap-2">
         {group.name}
+        {#if mode === 'swarm'}
+          <span class="text-xs font-normal text-muted-foreground">(Swarm)</span>
+        {/if}
       </h2>
     </div>
   {/if}
 
-  {#if loading && containers.length === 0}
+  {#if loading && items.length === 0}
     <!-- Initial loading state -->
-    <p class="text-sm text-muted-foreground">Loading containers...</p>
+    <p class="text-sm text-muted-foreground">Loading {mode === 'swarm' ? 'services' : 'containers'}...</p>
   {:else if error}
     <!-- Error state (similar to widget error handling) -->
     <p class="text-sm text-destructive">{error}</p>
-  {:else if items.length === 0}
+  {:else if serviceItems.length === 0}
     <!-- Empty state -->
-    <p class="text-sm text-muted-foreground">No containers found</p>
+    <p class="text-sm text-muted-foreground">No {mode === 'swarm' ? 'services' : 'containers'} found</p>
   {:else}
-    <!-- Container grid with clickable cards -->
+    <!-- Item grid with clickable cards -->
     <div class="grid gap-4 {gridCols[cols] || gridCols[3]}">
-      {#each items as item (item.name)}
+      {#each serviceItems as item (item.name)}
         <ServiceCard service={item} />
       {/each}
     </div>

@@ -29,8 +29,61 @@ type DockerRawContainer = {
   Labels?: Record<string, string>;
 };
 
+type DockerService = {
+  ID: string;
+  Version: { Index: number };
+  CreatedAt: string;
+  UpdatedAt: string;
+  Spec: {
+    Name: string;
+    Labels?: Record<string, string>;
+    TaskTemplate: {
+      ContainerSpec: {
+        Image: string;
+      };
+    };
+  };
+  Endpoint?: {
+    Ports?: Array<{ Protocol: string; PublishedPort?: number; TargetPort: number }>;
+  };
+};
+
+type DockerTask = {
+  ID: string;
+  ServiceID: string;
+  Status: {
+    State: string;
+    ContainerStatus?: { ContainerID: string };
+  };
+  DesiredState: string;
+};
+
+type DockerSwarmInfo = {
+  Swarm?: {
+    NodeID: string;
+    LocalNodeState: string;
+  };
+};
+
+type DockerEvent = {
+  Type: string;
+  Action: string;
+  Actor: {
+    ID: string;
+    Attributes?: Record<string, string>;
+  };
+  time: number;
+  timeNano: number;
+};
+
+type EventCallback = (event: DockerEvent) => void;
+
 type DockerClient = {
   listContainers(options: { all: boolean }): Promise<DockerRawContainer[]>;
+  listServices(): Promise<DockerService[]>;
+  getServiceTasks(serviceId: string): Promise<DockerTask[]>;
+  checkSwarmMode(): Promise<boolean>;
+  subscribeToEvents(options: { filters?: Record<string, string[]> }, callback: EventCallback): () => void;
 };
 
 let dockerClient: DockerClient | null = null;
@@ -61,6 +114,50 @@ function createDockerClient(config: DockerHttpConfig): DockerClient {
       const data = await dockerRequest(config, { method: 'GET', path });
       return parseJson<DockerRawContainer[]>(data, 'listContainers');
     },
+
+    async listServices() {
+      const path = '/services';
+      const data = await dockerRequest(config, { method: 'GET', path });
+      return parseJson<DockerService[]>(data, 'listServices');
+    },
+
+    async getServiceTasks(serviceId: string) {
+      const filters = JSON.stringify({ service: [serviceId] });
+      const path = `/tasks?filters=${encodeURIComponent(filters)}`;
+      const data = await dockerRequest(config, { method: 'GET', path });
+      return parseJson<DockerTask[]>(data, 'getServiceTasks');
+    },
+
+    async checkSwarmMode() {
+      try {
+        const path = '/info';
+        const data = await dockerRequest(config, { method: 'GET', path });
+        const info = parseJson<DockerSwarmInfo>(data, 'checkSwarmMode');
+        return info.Swarm?.LocalNodeState === 'active';
+      } catch (error) {
+        console.warn('[docker-client] Failed to check Swarm mode:', error);
+        return false;
+      }
+    },
+
+    subscribeToEvents(options, callback) {
+      const params = new URLSearchParams();
+      if (options.filters) {
+        params.set('filters', JSON.stringify(options.filters));
+      }
+
+      const path = `/events?${params.toString()}`;
+      const cleanup = dockerStreamRequest(config, { method: 'GET', path }, (chunk) => {
+        try {
+          const event = parseJson<DockerEvent>(chunk, 'event');
+          callback(event);
+        } catch (error) {
+          console.error('[docker-client] Failed to parse event:', error);
+        }
+      });
+
+      return cleanup;
+    },
   };
 }
 
@@ -76,6 +173,91 @@ function parseJson<T>(data: string, context: string): T {
 function joinBasePath(baseUrl: URL, path: string): string {
   const basePath = baseUrl.pathname && baseUrl.pathname !== '/' ? baseUrl.pathname.replace(/\/+$/, '') : '';
   return `${basePath}${path}`;
+}
+
+function dockerStreamRequest(
+  config: DockerHttpConfig,
+  req: { method: 'GET'; path: string },
+  onData: (chunk: string) => void
+): () => void {
+  const headers: Record<string, string> = {
+    ...(config.headers ?? {}),
+    Accept: 'application/json',
+  };
+
+  const onResponse = (res: http.IncomingMessage) => {
+    res.setEncoding('utf8');
+
+    let buffer = '';
+    res.on('data', (chunk: string) => {
+      buffer += chunk;
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.trim()) {
+          onData(line);
+        }
+      }
+    });
+
+    res.on('end', () => {
+      console.log('[docker-client] Event stream ended');
+    });
+
+    res.on('error', (error) => {
+      console.error('[docker-client] Event stream error:', error);
+    });
+  };
+
+  let request: http.ClientRequest;
+
+  if (config.kind === 'socket') {
+    request = http.request(
+      {
+        socketPath: config.socketPath,
+        path: req.path,
+        method: req.method,
+        headers,
+      },
+      onResponse
+    );
+  } else {
+    const isHttps = config.baseUrl.protocol === 'https:';
+    const requester = isHttps ? https : http;
+    const port = config.baseUrl.port ? Number(config.baseUrl.port) : isHttps ? 443 : 80;
+
+    request = requester.request(
+      {
+        protocol: config.baseUrl.protocol,
+        hostname: config.baseUrl.hostname,
+        port,
+        path: joinBasePath(config.baseUrl, req.path),
+        method: req.method,
+        headers,
+        ...(isHttps
+          ? {
+              ca: config.tls?.ca,
+              cert: config.tls?.cert,
+              key: config.tls?.key,
+            }
+          : {}),
+      },
+      onResponse
+    );
+  }
+
+  request.on('error', (error) => {
+    console.error('[docker-client] Event stream request error:', error);
+  });
+
+  request.end();
+
+  // Return cleanup function
+  return () => {
+    console.log('[docker-client] Closing event stream');
+    request.destroy();
+  };
 }
 
 function dockerRequest(
@@ -202,3 +384,6 @@ export function getDockerClient(): DockerClient {
 export function closeDockerClient(): void {
   dockerClient = null;
 }
+
+// Export types for use in other modules
+export type { DockerRawContainer, DockerService, DockerTask, DockerEvent, EventCallback };

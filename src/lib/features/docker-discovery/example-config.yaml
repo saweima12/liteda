@@ -1,0 +1,217 @@
+# Docker Discovery Feature - Example Configuration
+#
+# This file shows example configurations for different scenarios.
+# Copy the relevant parts to your config/settings.yaml
+
+# ============================================================================
+# Example 1: Basic Container Discovery (Default)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      targetPages: [home]
+      groupName: Docker Containers
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+# ============================================================================
+# Example 2: Docker Swarm Mode (Auto-Detection)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      mode: auto  # Automatically detects Swarm and switches modes
+      targetPages: [home]
+      groupName: Docker Services
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+# ============================================================================
+# Example 3: Event Streaming (Real-time Updates)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      mode: auto
+      enableEventStream: true  # ⚠️ Experimental! Real-time events
+      refreshInterval: 60000   # Fallback interval if events fail
+      targetPages: [home]
+      groupName: Docker (Live)
+      groupIcon: docker
+      columns: 3
+
+# ============================================================================
+# Example 4: With Label Filtering
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      targetPages: [home]
+      groupName: Production Services
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+      # Only show containers/services with these labels
+      includeLabels:
+        - app              # Any container with "app" label
+        - env=production   # Only production containers
+
+      # Hide containers/services with these labels
+      excludeLabels:
+        - internal         # Hide internal services
+        - hidden=true      # Hide explicitly marked containers
+
+# ============================================================================
+# Example 5: TCP Connection (Remote Docker)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      endpoint: http://docker-host:2375  # Remote Docker daemon
+      targetPages: [home]
+      groupName: Remote Docker
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+# ============================================================================
+# Example 6: TCP with TLS (Secure Remote)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      endpoint: https://docker-host:2376
+      tls:
+        ca: /app/certs/ca.pem
+        cert: /app/certs/cert.pem
+        key: /app/certs/key.pem
+      targetPages: [home]
+      groupName: Secure Docker
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+# ============================================================================
+# Example 7: Portainer Integration
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      targetPages: [home]
+      groupName: Docker Containers
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+      # Clickable links to Portainer
+      urlTemplate: http://portainer.local:9000/#!/1/docker/containers/{id}
+
+# ============================================================================
+# Example 8: Multi-Page Display
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+
+      # Show on multiple pages
+      targetPages:
+        - home
+        - infrastructure
+        - monitoring
+
+      groupName: Docker Status
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 4
+
+# ============================================================================
+# Example 9: Force Swarm Mode (Even if Swarm is Inactive)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      mode: swarm  # Force Swarm API (will fail if Swarm not active)
+      targetPages: [home]
+      groupName: Swarm Services
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+# ============================================================================
+# Example 10: Force Container Mode (Even in Swarm)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      mode: container  # Show individual containers, not aggregated services
+      targetPages: [home]
+      groupName: All Containers
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 4
+
+# ============================================================================
+# Example 11: Debug Mode (Verbose Logging)
+# ============================================================================
+# Run with: DEBUG=docker-client,docker-handler bun dev
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      socketPath: /var/run/docker.sock
+      mode: auto
+      enableEventStream: true
+      targetPages: [home]
+      groupName: Docker (Debug)
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+# ============================================================================
+# Example 12: Production Setup (Recommended)
+# ============================================================================
+features:
+  docker-discovery:
+    enabled: true
+    vars:
+      # Connection
+      socketPath: /var/run/docker.sock
+
+      # Mode
+      mode: auto  # Auto-detect Swarm
+      enableEventStream: false  # Disable experimental features in production
+
+      # Display
+      targetPages: [home]
+      groupName: Services
+      groupIcon: docker
+      refreshInterval: 30000
+      columns: 3
+
+      # Filtering (optional)
+      includeLabels:
+        - liteda.show=true  # Only show explicitly marked containers
+
+      # Integration (optional)
+      urlTemplate: http://portainer:9000/#!/1/docker/containers/{id}

@@ -173,6 +173,45 @@
                       "properties": {
                         "type": {
                           "type": "string",
+                          "const": "forgejo"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "token": {
+                              "type": "string"
+                            },
+                            "username": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "token"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Forgejo repository statistics (Gitea API compatible)"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
                           "const": "sonarr"
                         },
                         "interval": {
@@ -196,6 +235,42 @@
                           ],
                           "additionalProperties": false,
                           "description": "Sonarr TV show management"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "home-assistant"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "token": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "token"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Home Assistant statistics"
                         }
                       },
                       "required": [
@@ -314,6 +389,42 @@
                       "properties": {
                         "type": {
                           "type": "string",
+                          "const": "immich"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "apiKey": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url",
+                            "apiKey"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Immich photo library statistics"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
                           "const": "adguard"
                         },
                         "interval": {
@@ -380,6 +491,48 @@
                           ],
                           "additionalProperties": false,
                           "description": "Cloudflare Tunnel status"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "vars"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "const": "peanut"
+                        },
+                        "interval": {
+                          "type": "number",
+                          "description": "Polling interval in milliseconds"
+                        },
+                        "vars": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "format": "uri"
+                            },
+                            "key": {
+                              "type": "string",
+                              "default": "ups"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "password": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "url"
+                          ],
+                          "additionalProperties": false,
+                          "description": "PeaNUT UPS monitor statistics"
                         }
                       },
                       "required": [
@@ -795,6 +948,45 @@
                             "properties": {
                               "type": {
                                 "type": "string",
+                                "const": "forgejo"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "token": {
+                                    "type": "string"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "token"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Forgejo repository statistics (Gitea API compatible)"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
                                 "const": "sonarr"
                               },
                               "interval": {
@@ -818,6 +1010,42 @@
                                 ],
                                 "additionalProperties": false,
                                 "description": "Sonarr TV show management"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "home-assistant"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "token": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "token"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Home Assistant statistics"
                               }
                             },
                             "required": [
@@ -936,6 +1164,42 @@
                             "properties": {
                               "type": {
                                 "type": "string",
+                                "const": "immich"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "apiKey": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url",
+                                  "apiKey"
+                                ],
+                                "additionalProperties": false,
+                                "description": "Immich photo library statistics"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
                                 "const": "adguard"
                               },
                               "interval": {
@@ -1002,6 +1266,48 @@
                                 ],
                                 "additionalProperties": false,
                                 "description": "Cloudflare Tunnel status"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "vars"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "peanut"
+                              },
+                              "interval": {
+                                "type": "number",
+                                "description": "Polling interval in milliseconds"
+                              },
+                              "vars": {
+                                "type": "object",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "key": {
+                                    "type": "string",
+                                    "default": "ups"
+                                  },
+                                  "username": {
+                                    "type": "string"
+                                  },
+                                  "password": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "url"
+                                ],
+                                "additionalProperties": false,
+                                "description": "PeaNUT UPS monitor statistics"
                               }
                             },
                             "required": [
